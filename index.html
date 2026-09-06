@@ -22,7 +22,7 @@
   }
   .screen.active { opacity: 1; pointer-events: auto; transform: scale(1); }
 
-  /* ═══════════ CALCULATOR — compact blue/black ═══════════ */
+  /* ═══════════ CALCULATOR ═══════════ */
   .calc {
     width: 100%; max-width: 296px; user-select: none;
     background: #0a0e18;
@@ -35,14 +35,8 @@
     display: flex; justify-content: space-between; align-items: center;
     margin-bottom: 8px; padding: 0 4px;
   }
-  .brand {
-    font-size: 11px; font-weight: 700; letter-spacing: 2px;
-    color: #4a7ec2; text-transform: uppercase;
-  }
-  .histbtn {
-    background: none; border: none; color: #34558a; font-size: 10px;
-    font-weight: 700; letter-spacing: 1px; cursor: pointer;
-  }
+  .brand { font-size: 11px; font-weight: 700; letter-spacing: 2px; color: #4a7ec2; text-transform: uppercase; }
+  .histbtn { background: none; border: none; color: #34558a; font-size: 10px; font-weight: 700; letter-spacing: 1px; cursor: pointer; }
   .histbtn:hover { color: #6ea8ff; }
 
   .display {
@@ -107,7 +101,7 @@
   .k.eq:hover { background: #2b6fe0; }
   .k.second-on { background: #1a3a6a !important; color: #6ea8ff !important; border-color: #2a4a80 !important; }
 
-  /* ═══════════ LAUNCHER (blue/black to match) ═══════════ */
+  /* ═══════════ LAUNCHER ═══════════ */
   .wrap { width: 100%; max-width: 560px; }
   header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; }
   h1 { font-size: 20px; letter-spacing: 1px; color: #e8f1ff; }
@@ -344,7 +338,11 @@ function showScreen(id) {
 }
 
 // ═════════════════════════════════════════════════════════
-//  CALCULATOR ENGINE
+//  CALCULATOR ENGINE — fixed
+//  THE BUG THAT WAS KILLED: ÷ and × are unicode chars (U+00F7,
+//  U+00D7) and the old operator check was '+-*/^'.indexOf(c)
+//  which never matched them -> every × ÷ expression threw
+//  Syntax. now they are first-class operators.
 // ═════════════════════════════════════════════════════════
 (function() {
   var SECRET = 3396981;
@@ -369,16 +367,21 @@ function showScreen(id) {
   if (unlocked) secretDot.classList.add('on');
   if (mem !== 0) flagMem.style.display = '';
 
+  // operator chars — ÷ and × INCLUDED this time
+  var OPCHARS = '+-*/^÷×';
+  var OPMAP = { '+': '+', '-': '-', '*': '*', '/': '/', '^': '^', '÷': '/', '×': '*' };
+
   var FUNCS = ['asin','acos','atan','tenpow','sqrt','sin','cos','tan','log','exp','ln','ans','neg'];
   var POSTFIX = { '!': true, '%': true };
 
+  // ── TOKENIZER ──
   function tokenize(src) {
     var toks = [];
     var i = 0, n = src.length;
-    var prevKind = null;
+    var prevKind = null; // 'num'|'const'|'op'|'post'|'func'|'('|')'
 
     function isDigit(c) { return c >= '0' && c <= '9'; }
-    function isLetter(c) { return /[a-zA-Z]/.test(c); }
+    function isLetter(c) { return (c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z'); }
 
     while (i < n) {
       var c = src[i];
@@ -387,21 +390,22 @@ function showScreen(id) {
       var kind = null;
       var tok = null;
 
-      if (isDigit(c) || (c === '.' && isDigit(src[i+1] || ''))) {
+      // number
+      if (isDigit(c) || (c === '.' && isDigit(src.charAt(i + 1)))) {
         var j = i;
         while (j < n && (isDigit(src[j]) || src[j] === '.')) j++;
         tok = { t: 'num', v: parseFloat(src.slice(i, j)) };
         kind = 'num';
         i = j;
       }
-      else if (isLetter(c) || c === '√') {
+      // letters: functions / constants
+      else if (isLetter(c)) {
         var matched = null, mLen = 0;
         var rest = src.slice(i).toLowerCase();
         for (var f = 0; f < FUNCS.length; f++) {
           var fn = FUNCS[f];
           if (rest.indexOf(fn) === 0 && fn.length > mLen) { matched = fn; mLen = fn.length; }
         }
-        if (c === '√') { matched = 'sqrt'; mLen = 1; }
         if (!matched && c.toLowerCase() === 'e') { matched = 'e'; mLen = 1; }
         if (!matched) throw 'Syntax';
         if (matched === 'e') { tok = { t: 'num', v: Math.E }; kind = 'const'; }
@@ -409,16 +413,19 @@ function showScreen(id) {
         else { tok = { t: 'func', v: matched }; kind = 'func'; }
         i += mLen;
       }
+      // π constant
       else if (c === 'π') { tok = { t: 'num', v: Math.PI }; kind = 'const'; i++; }
-      else if ('+-*/^'.indexOf(c) >= 0) {
-        var map = { '+': '+', '-': '-', '*': '*', '/': '/', '^': '^', '÷': '/', '×': '*' };
-        var sym = c;
+      // √ sqrt
+      else if (c === '√') { tok = { t: 'func', v: 'sqrt' }; kind = 'func'; i++; }
+      // operators — ÷ × INCLUDED
+      else if (OPCHARS.indexOf(c) >= 0) {
         if (c === '-' && (prevKind === null || prevKind === 'op' || prevKind === '(' || prevKind === 'post')) {
           tok = { t: 'op', v: 'neg', unary: true }; kind = 'op';
-        } else if (c === '+') {
-          if (prevKind === null || prevKind === 'op' || prevKind === '(') { i++; continue; }
+        } else if (c === '+' && (prevKind === null || prevKind === 'op' || prevKind === '(')) {
+          i++; continue; // unary plus: skip
+        } else {
+          tok = { t: 'op', v: OPMAP[c] }; kind = 'op';
         }
-        if (!tok) { tok = { t: 'op', v: map[sym] }; kind = 'op'; }
         i++;
       }
       else if (c === '(') { tok = { t: '(' }; kind = '('; i++; }
@@ -426,6 +433,7 @@ function showScreen(id) {
       else if (POSTFIX[c]) { tok = { t: 'post', v: c }; kind = 'post'; i++; }
       else throw 'Syntax';
 
+      // implicit multiplication: 2π, 3(4+5), (2)(3), 5!
       var curIsValStart = (kind === 'num' || kind === 'const' || kind === 'func' || kind === '(');
       var prevIsValEnd = (prevKind === 'num' || prevKind === 'const' || prevKind === ')' || prevKind === 'post');
       if (curIsValStart && prevIsValEnd) {
@@ -438,6 +446,7 @@ function showScreen(id) {
     return toks;
   }
 
+  // ── SHUNTING YARD → RPN ──
   var PREC = { '+': 2, '-': 2, '*': 3, '/': 3, '^': 4, neg: 4.5 };
   var POSTPREC = 5.5;
   var RIGHTASSOC = { '^': true, neg: true };
@@ -463,13 +472,14 @@ function showScreen(id) {
         ops.push(tk);
         continue;
       }
+      // operator
       var p = tk.unary ? PREC.neg : PREC[tk.v];
       while (ops.length) {
         var t1 = top();
         if (t1.t === 'op' || t1.t === 'post') {
-          var p1 = t1.t === 'post' ? POSTPREC : (t1.unary ? PREC.neg : PREC[t1.v]);
-          var right = tk.unary ? true : RIGHTASSOC[tk.v];
-          if (p1 > p || (p1 === p && !right)) { out.push(ops.pop()); continue; }
+          var p1 = (t1.t === 'post') ? POSTPREC : (t1.unary ? PREC.neg : PREC[t1.v]);
+          var rightAssoc = tk.unary ? true : !!RIGHTASSOC[tk.v];
+          if (p1 > p || (p1 === p && !rightAssoc)) { out.push(ops.pop()); continue; }
         }
         break;
       }
@@ -483,6 +493,7 @@ function showScreen(id) {
     return out;
   }
 
+  // ── EVAL ──
   function fact(x) {
     if (x < 0 || x % 1 !== 0) return NaN;
     if (x > 170) return Infinity;
@@ -497,9 +508,9 @@ function showScreen(id) {
       case 'sin':   return Math.sin(deg ? x * d : x);
       case 'cos':   return Math.cos(deg ? x * d : x);
       case 'tan':   return Math.tan(deg ? x * d : x);
-      case 'asin':  { var r = Math.asin(x); return deg ? r / d : r; }
-      case 'acos':  { var r2 = Math.acos(x); return deg ? r2 / d : r2; }
-      case 'atan':  { var r3 = Math.atan(x); return deg ? r3 / d : r3; }
+      case 'asin':  var r = Math.asin(x); return deg ? r / d : r;
+      case 'acos':  var r2 = Math.acos(x); return deg ? r2 / d : r2;
+      case 'atan':  var r3 = Math.atan(x); return deg ? r3 / d : r3;
       case 'sqrt':  return Math.sqrt(x);
       case 'ln':    return Math.log(x);
       case 'log':   return Math.log10(x);
@@ -567,6 +578,7 @@ function showScreen(id) {
     return String(parseFloat(x.toPrecision(12)));
   }
 
+  // ── DISPLAY ──
   function update() {
     dBig.classList.remove('err');
     if (mode === 'result') return;
@@ -579,6 +591,7 @@ function showScreen(id) {
     } else dSmall.textContent = '';
   }
 
+  // ── SECRET ──
   function unlock() {
     unlocked = true;
     try { sessionStorage.setItem('lx_unlocked', '1'); } catch (e) {}
@@ -590,24 +603,29 @@ function showScreen(id) {
     if (unlocked) showScreen('launcherScreen');
   });
 
+  // ── INPUT ──
   var MULTI = ['asin(','acos(','atan(','tenpow(','sqrt(','sin(','cos(','tan(','log(','exp(','ln(','ans','π'];
   function backspace() {
     mode = 'input';
     for (var i = 0; i < MULTI.length; i++) {
-      if (expr.endsWith(MULTI[i])) { expr = expr.slice(0, -MULTI[i].length); update(); return; }
+      if (expr.indexOf(MULTI[i], expr.length - MULTI[i].length) !== -1) {
+        expr = expr.slice(0, -MULTI[i].length); update(); return;
+      }
     }
     expr = expr.slice(0, -1);
     update();
   }
 
+  var FUNCS_INSERT = ['sin(','cos(','tan(','asin(','acos(','atan(','log(','ln(','exp(','tenpow(','√('];
   function insert(val) {
     var startsValue = /^[0-9.πe]/.test(val) || val === 'ans'
-      || /(\(|$)/.test(val) && ['sin(','cos(','tan(','asin(','acos(','atan(','log(','ln(','exp(','tenpow(','√('].indexOf(val) >= 0;
+      || FUNCS_INSERT.indexOf(val) >= 0;
     if (mode === 'result') {
       if (/^[0-9.]$/.test(val) || (startsValue && !/^[\^!%+÷×\-]$/.test(val))) {
         expr = '';
       } else {
         expr = fmt(lastResult);
+        if (expr === 'Error' || expr === '∞' || expr === '-∞') expr = '0';
       }
       mode = 'input';
     }
@@ -641,10 +659,10 @@ function showScreen(id) {
     }
   }
 
+  // ── HISTORY ──
   var hist = [];
   try { hist = JSON.parse(localStorage.getItem('calc_hist') || '[]'); } catch (e) { hist = []; }
   var histPanel = document.getElementById('histPanel');
-  var histBtn = document.getElementById('histBtn');
 
   function pushHistory(e, r) {
     hist.unshift({ e: e, r: fmt(r) });
@@ -669,8 +687,7 @@ function showScreen(id) {
     for (var j = 0; j < items.length; j++) {
       (function(item) {
         item.addEventListener('click', function() {
-          var idx = parseInt(item.getAttribute('data-i'));
-          expr = hist[idx].e;
+          expr = hist[parseInt(item.getAttribute('data-i'))].e;
           mode = 'input';
           update();
         });
@@ -679,10 +696,11 @@ function showScreen(id) {
   }
   renderHist();
 
-  histBtn.addEventListener('click', function() {
+  document.getElementById('histBtn').addEventListener('click', function() {
     histPanel.classList.toggle('open');
   });
 
+  // ── 2ND / DEG ──
   var k2nd = document.getElementById('k2nd');
   var FN2 = {
     sin: ['asin(', 'sin⁻¹'], cos: ['acos(', 'cos⁻¹'], tan: ['atan(', 'tan⁻¹'],
@@ -750,6 +768,7 @@ function showScreen(id) {
   document.getElementById('kBack').addEventListener('click', backspace);
   document.getElementById('kEq').addEventListener('click', equals);
 
+  // ── MEMORY ──
   function curVal() {
     try { return safeEval(expr); } catch (e) { return lastResult; }
   }
@@ -762,14 +781,15 @@ function showScreen(id) {
   document.getElementById('kMR').addEventListener('click', function() { insert(String(mem)); });
   document.getElementById('kMC').addEventListener('click', function() { mem = 0; saveMem(); });
 
+  // ── ± ──
   document.getElementById('kNeg').addEventListener('click', function() {
     if (mode === 'result') { expr = '(-' + fmt(lastResult) + ')'; mode = 'input'; update(); return; }
     var m = expr.match(/(\d*\.?\d+)$/);
     if (m) {
       var start = expr.length - m[1].length;
       var before = expr.slice(0, start);
-      if (/^\($/.test(before) && /-$/.test(before.slice(0, -1))) {
-        expr = expr.slice(0, -m[1].length - 2) + m[1];
+      if (before.length >= 2 && before.charAt(before.length - 1) === '(' && before.charAt(before.length - 2) === '-') {
+        expr = expr.slice(0, start - 2) + m[1];
       } else {
         expr = before + '(-' + m[1] + ')';
       }
@@ -779,8 +799,9 @@ function showScreen(id) {
     update();
   });
 
+  // ── KEYBOARD ──
   document.addEventListener('keydown', function(e) {
-    if (document.getElementById('calcScreen').classList.contains('active') !== true) return;
+    if (!document.getElementById('calcScreen').classList.contains('active')) return;
     if (e.target && /INPUT|TEXTAREA/.test(e.target.tagName)) return;
     var key = e.key;
     if (/^[0-9]$/.test(key)) { insert(key); e.preventDefault(); }
@@ -803,10 +824,10 @@ function showScreen(id) {
 })();
 
 // ═════════════════════════════════════════════════════════
-//  HTML LAUNCHER + COMPRESSED .LAUNCHPAD SYSTEM
-//  Format: [magic "LPZ1"][4B orig size][gzip data]
-//  Fallback: [magic "LPL1"][4B orig size][LZ data]
-//  Legacy: [magic "LAUNCHPAD1"][plain JSON] (still loads)
+//  HTML LAUNCHER + .LAUNCHPAD v2 (binary + minify + gzip)
+//  Formats written:  LPZ2 (gzip) | LPL2 (LZ fallback)
+//  Formats read:     LPZ2, LPL2, LPZ1, LPL1, LAUNCHPAD1
+//  v2.1: TextEncoder/TextDecoder for UTF-8 correctness
 // ═════════════════════════════════════════════════════════
 (function() {
   var DB_NAME = 'html_launcher_db';
@@ -815,8 +836,10 @@ function showScreen(id) {
   var files = [];
   var launchMode = 'blank';
 
-  var MAGIC_GZIP = 'LPZ1';
-  var MAGIC_LZ = 'LPL1';
+  var MAGIC_GZ2  = 'LPZ2';
+  var MAGIC_LZ2  = 'LPL2';
+  var MAGIC_GZ1  = 'LPZ1';
+  var MAGIC_LZ1  = 'LPL1';
   var MAGIC_JSON = 'LAUNCHPAD1';
 
   function $(id) { return document.getElementById(id); }
@@ -856,13 +879,18 @@ function showScreen(id) {
     });
   }
 
-  // ── byte helpers ──
+  // ── byte helpers (UTF-8 safe) ──
+  var TE = (typeof TextEncoder !== 'undefined') ? new TextEncoder() : null;
+  var TD = (typeof TextDecoder !== 'undefined') ? new TextDecoder() : null;
+
   function textToBytes(str) {
+    if (TE) return TE.encode(str);
     var arr = new Uint8Array(str.length);
     for (var i = 0; i < str.length; i++) arr[i] = str.charCodeAt(i) & 0xFF;
     return arr;
   }
   function bytesToText(bytes) {
+    if (TD) return TD.decode(bytes);
     var str = '';
     for (var i = 0; i < bytes.length; i++) str += String.fromCharCode(bytes[i]);
     return str;
@@ -877,10 +905,68 @@ function showScreen(id) {
     return new Uint8Array([(n >>> 24) & 0xFF, (n >>> 16) & 0xFF, (n >>> 8) & 0xFF, n & 0xFF]);
   }
   function bytesToU32(b, o) {
-    return (b[o] << 24) | (b[o + 1] << 16) | (b[o + 2] << 8) | b[o + 3];
+    return ((b[o] << 24) | (b[o + 1] << 16) | (b[o + 2] << 8) | b[o + 3]) >>> 0;
+  }
+  function u16ToBytes(n) {
+    return new Uint8Array([(n >> 8) & 0xFF, n & 0xFF]);
   }
 
-  // ── GZIP via CompressionStream ──
+  // ── minifier ──
+  function minifyHTML(src) {
+    if (typeof src !== 'string' || src.length < 64) return src;
+    var aggressive = !/<script/i.test(src) && !/<pre/i.test(src) && !/<textarea/i.test(src);
+    var lines = src.split('\n');
+    var out = [];
+    for (var i = 0; i < lines.length; i++) {
+      var line = lines[i].replace(/\s+$/, '').replace(/^[ \t]+/, '');
+      if (line === '') continue;
+      out.push(line);
+    }
+    var result = out.join('\n');
+    if (aggressive) result = result.replace(/[ \t]{2,}/g, ' ');
+    return result;
+  }
+
+  // ── binary TLV container ──
+  function buildTLV(list) {
+    var parts = [];
+    for (var i = 0; i < list.length; i++) {
+      var nameB = textToBytes(list[i].name);
+      var htmlB = textToBytes(list[i].html);
+      parts.push(concatBytes(
+        concatBytes(u16ToBytes(nameB.length), nameB),
+        concatBytes(u32ToBytes(htmlB.length), htmlB)
+      ));
+    }
+    var total = 0;
+    parts.forEach(function(p) { total += p.length; });
+    var outp = new Uint8Array(total);
+    var off = 0;
+    parts.forEach(function(p) { outp.set(p, off); off += p.length; });
+    return outp;
+  }
+
+  function parseTLV(bytes) {
+    var list = [];
+    var i = 0, n = bytes.length;
+    while (i + 2 <= n) {
+      var nameLen = (bytes[i] << 8) | bytes[i + 1];
+      i += 2;
+      if (i + nameLen + 4 > n) throw 'Corrupt';
+      var name = bytesToText(bytes.subarray(i, i + nameLen));
+      i += nameLen;
+      var htmlLen = bytesToU32(bytes, i);
+      i += 4;
+      if (i + htmlLen > n) throw 'Corrupt';
+      var html = bytesToText(bytes.subarray(i, i + htmlLen));
+      i += htmlLen;
+      list.push({ name: name, html: html });
+    }
+    if (i !== n) throw 'Corrupt';
+    return list;
+  }
+
+  // ── gzip via CompressionStream ──
   function hasCompressionStream() {
     return typeof CompressionStream !== 'undefined' &&
            typeof DecompressionStream !== 'undefined';
@@ -911,7 +997,7 @@ function showScreen(id) {
     });
   }
 
-  // ── LZ fallback (window-based, hash-chain matched) ──
+  // ── LZ fallback ──
   function lzCompress(bytes) {
     var WINDOW = 4096, MAX_MATCH = 255, MIN_MATCH = 4;
     var out = [];
@@ -1076,22 +1162,19 @@ function showScreen(id) {
     });
   };
 
-  // ═══════════ COMPRESSED .LAUNCHPAD ═══════════
-
-  // EXPORT — compress with gzip (or LZ), wrap with header
+  // ═══ EXPORT: minify → TLV → gzip → [LPZ2][4B size][data] ═══
   window.exportPack = function() {
     if (!files.length) { status('library is empty — nothing to save', 'err'); return; }
 
-    var pack = {
-      magic: MAGIC_JSON,
-      exported: Date.now(),
-      count: files.length,
-      files: files.map(function(f) {
-        return { name: f.name, size: f.size, html: f.html };
-      })
-    };
+    var rawSize = 0;
+    files.forEach(function(f) { rawSize += f.html.length; });
 
-    var jsonBytes = textToBytes(JSON.stringify(pack));
+    var entries = [];
+    files.forEach(function(f) {
+      entries.push({ name: f.name, html: minifyHTML(f.html) });
+    });
+
+    var tlv = buildTLV(entries);
 
     var d = new Date();
     var stamp = d.getFullYear() + '-' +
@@ -1110,33 +1193,26 @@ function showScreen(id) {
       document.body.removeChild(a);
       setTimeout(function() { URL.revokeObjectURL(url); }, 5000);
 
-      var ratio = ((1 - fileBytes.length / jsonBytes.length) * 100).toFixed(1);
+      var ratio = ((1 - fileBytes.length / rawSize) * 100).toFixed(1);
       status('saved ' + files.length + ' files → ' + fname +
-        ' | ' + fmtSize(jsonBytes.length) + ' → ' + fmtSize(fileBytes.length) +
-        ' (-' + ratio + '%, ' + method + ')', 'ok');
+        ' | ' + fmtSize(rawSize) + ' → ' + fmtSize(fileBytes.length) +
+        ' (-' + ratio + '%, min+' + method + ')', 'ok');
     }
 
     if (hasCompressionStream()) {
-      streamGzip(jsonBytes, CompressionStream).then(function(comp) {
-        var fileBytes = concatBytes(
-          concatBytes(textToBytes(MAGIC_GZIP), u32ToBytes(jsonBytes.length)), comp);
-        finish(fileBytes, 'gzip');
-      }).catch(function(e) {
-        // gzip failed? fall to LZ
-        var lz = lzCompress(jsonBytes);
-        var fileBytes = concatBytes(
-          concatBytes(textToBytes(MAGIC_LZ), u32ToBytes(jsonBytes.length)), lz);
-        finish(fileBytes, 'lz');
+      streamGzip(tlv, CompressionStream).then(function(comp) {
+        finish(concatBytes(concatBytes(textToBytes(MAGIC_GZ2), u32ToBytes(tlv.length)), comp), 'gzip');
+      }).catch(function() {
+        var lz = lzCompress(tlv);
+        finish(concatBytes(concatBytes(textToBytes(MAGIC_LZ2), u32ToBytes(tlv.length)), lz), 'lz');
       });
     } else {
-      var lz = lzCompress(jsonBytes);
-      var fileBytes = concatBytes(
-        concatBytes(textToBytes(MAGIC_LZ), u32ToBytes(jsonBytes.length)), lz);
-      finish(fileBytes, 'lz');
+      var lz = lzCompress(tlv);
+      finish(concatBytes(concatBytes(textToBytes(MAGIC_LZ2), u32ToBytes(tlv.length)), lz), 'lz');
     }
   };
 
-  // IMPORT — detect format, decompress, restore
+  // ═══ IMPORT: reads v2 + all legacy formats ═══
   window.importPack = function() { $('packInput').click(); };
 
   $('packInput').addEventListener('change', function() {
@@ -1147,38 +1223,30 @@ function showScreen(id) {
     var reader = new FileReader();
     reader.onload = function() {
       var raw = new Uint8Array(reader.result);
+      var magic = bytesToText(raw.subarray(0, 10));
 
-      // sniff magic
-      var magic = bytesToText(raw.slice(0, 10));
-
-      function afterDecompress(jsonText) {
-        var pack;
-        try { pack = JSON.parse(jsonText); } catch (e) {
-          status('invalid .launchpad file (corrupt data)', 'err'); return;
-        }
-        if (!pack || pack.magic !== MAGIC_JSON || !pack.files || !pack.files.length) {
-          status('invalid .launchpad file (wrong format)', 'err'); return;
-        }
+      function importList(list) {
+        if (!list.length) { status('.launchpad contains no files', 'err'); return; }
 
         var existing = {};
         files.forEach(function(f) { existing[f.name + '|' + f.html.length] = true; });
 
-        var added = 0, skipped = 0, pending = pack.files.length;
+        var added = 0, skipped = 0, pending = list.length;
 
-        pack.files.forEach(function(pf) {
-          if (!pf.name || typeof pf.html !== 'string') { skipped++; pending--; checkImport(); return; }
-          if (existing[pf.name + '|' + pf.html.length]) { skipped++; pending--; checkImport(); return; }
+        list.forEach(function(pf) {
+          if (!pf.name || typeof pf.html !== 'string') { skipped++; pending--; check(); return; }
+          if (existing[pf.name + '|' + pf.html.length]) { skipped++; pending--; check(); return; }
 
           var rec = {
             id: Date.now() + Math.floor(Math.random() * 1000),
             name: pf.name, size: pf.html.length, date: Date.now(), html: pf.html
           };
           dbOp('readwrite', function(s) { return s.put(rec); }).then(function() {
-            files.push(rec); added++; pending--; checkImport();
-          }).catch(function(e) { skipped++; pending--; checkImport(); });
+            files.push(rec); added++; pending--; check();
+          }).catch(function() { skipped++; pending--; check(); });
         });
 
-        function checkImport() {
+        function check() {
           if (pending > 0) return;
           render();
           status('loaded ' + added + ' file' + (added === 1 ? '' : 's') +
@@ -1186,36 +1254,44 @@ function showScreen(id) {
         }
       }
 
-      if (magic.indexOf(MAGIC_GZIP) === 0) {
-        // [LPZ1][4B size][gzip]
-        var body = raw.slice(8);
-        streamGzip(body, DecompressionStream).then(function(decomp) {
-          // verify size
-          var expected = bytesToU32(raw, 4);
-          if (decomp.length !== expected) {
-            status('corrupt file (size mismatch)', 'err'); return;
-          }
-          afterDecompress(bytesToText(decomp));
-        }).catch(function(e) {
-          status('decompression failed — corrupt file', 'err');
-        });
-      } else if (magic.indexOf(MAGIC_LZ) === 0) {
-        // [LPL1][4B size][lz]
-        try {
-          var body2 = raw.slice(8);
-          var decomp2 = lzDecompress(body2);
-          var expected2 = bytesToU32(raw, 4);
-          if (decomp2.length !== expected2) {
-            status('corrupt file (size mismatch)', 'err'); return;
-          }
-          afterDecompress(bytesToText(decomp2));
-        } catch (e) {
-          status('decompression failed — corrupt file', 'err');
-        }
-      } else if (magic.indexOf(MAGIC_JSON) === 0) {
-        // legacy plain JSON
-        afterDecompress(bytesToText(raw));
-      } else {
+      function importJSON(jsonText) {
+        var pack;
+        try { pack = JSON.parse(jsonText); } catch (e) {
+          status('corrupt file (bad JSON)', 'err'); return; }
+        if (!pack || !pack.files || !pack.files.length) {
+          status('invalid .launchpad (wrong format)', 'err'); return; }
+        importList(pack.files);
+      }
+
+      function verifyThenImport(decomp, expected) {
+        if (decomp.length !== expected) {
+          status('corrupt file (size mismatch)', 'err'); return; }
+        try { importList(parseTLV(decomp)); }
+        catch (e) { status('corrupt file (bad container)', 'err'); }
+      }
+
+      if (magic.indexOf(MAGIC_GZ2) === 0) {
+        streamGzip(raw.subarray(8), DecompressionStream).then(function(dec) {
+          verifyThenImport(dec, bytesToU32(raw, 4));
+        }).catch(function() { status('decompression failed — corrupt file', 'err'); });
+      }
+      else if (magic.indexOf(MAGIC_LZ2) === 0) {
+        try { verifyThenImport(lzDecompress(raw.subarray(8)), bytesToU32(raw, 4)); }
+        catch (e) { status('decompression failed — corrupt file', 'err'); }
+      }
+      else if (magic.indexOf(MAGIC_GZ1) === 0) {
+        streamGzip(raw.subarray(8), DecompressionStream).then(function(dec) {
+          importJSON(bytesToText(dec));
+        }).catch(function() { status('decompression failed — corrupt file', 'err'); });
+      }
+      else if (magic.indexOf(MAGIC_LZ1) === 0) {
+        try { importJSON(bytesToText(lzDecompress(raw.subarray(8)))); }
+        catch (e) { status('corrupt file', 'err'); }
+      }
+      else if (magic.indexOf(MAGIC_JSON) === 0) {
+        importJSON(bytesToText(raw));
+      }
+      else {
         status('not a .launchpad file', 'err');
       }
     };
@@ -1265,11 +1341,11 @@ function showScreen(id) {
 
   // ── config ──
   window.toggleSettings = function() { $('settings').classList.toggle('open'); };
-  window.setMode = function(mode) {
-    launchMode = mode;
-    $('modeBlank').classList.toggle('active', mode === 'blank');
-    $('modeBlob').classList.toggle('active', mode === 'blob');
-    try { localStorage.setItem('lx_mode', mode); } catch (e) {}
+  window.setMode = function(m) {
+    launchMode = m;
+    $('modeBlank').classList.toggle('active', m === 'blank');
+    $('modeBlob').classList.toggle('active', m === 'blob');
+    try { localStorage.setItem('lx_mode', m); } catch (e) {}
   };
   window.selfCloak = function() {
     var title = $('titleInput').value.trim();
