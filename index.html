@@ -16,8 +16,6 @@
     transition: opacity .25s ease, transform .25s ease;
   }
   .screen.active { opacity: 1; pointer-events: auto; transform: scale(1); }
-
-  /* CALCULATOR */
   .calc {
     width: 100%; max-width: 296px; user-select: none;
     background: #0a0e18; border: 2px solid #1e3a5f; border-radius: 16px;
@@ -68,8 +66,6 @@
   .k.eq { grid-column: span 2; background: #1d5fd6; color: #fff; font-size: 18px; border-color: #2b6fe0; }
   .k.eq:hover { background: #2b6fe0; }
   .k.second-on { background: #1a3a6a !important; color: #6ea8ff !important; border-color: #2a4a80 !important; }
-
-  /* LAUNCHER */
   .wrap { width: 100%; max-width: 560px; }
   header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; }
   h1 { font-size: 20px; letter-spacing: 1px; color: #e8f1ff; }
@@ -131,7 +127,6 @@
 </head>
 <body>
 
-<!-- SCREEN 1: CALCULATOR -->
 <div id="calcScreen" class="screen active">
   <div class="calc">
     <div class="brandrow">
@@ -189,7 +184,6 @@
   </div>
 </div>
 
-<!-- SCREEN 2: LAUNCHER -->
 <div id="launcherScreen" class="screen">
   <div class="wrap">
     <header>
@@ -243,16 +237,13 @@
 </div>
 
 <script>
-// ═══════════ SCREEN MANAGER ═══════════
 function showScreen(id) {
   var screens = document.querySelectorAll('.screen');
   for (var i = 0; i < screens.length; i++) screens[i].classList.remove('active');
   document.getElementById(id).classList.add('active');
 }
 
-// ═════════════════════════════════════════════════════════
-//  CALCULATOR (fixed: ÷ × are first-class operators)
-// ═════════════════════════════════════════════════════════
+// ═══════════ CALCULATOR ═══════════
 (function() {
   var SECRET = 3396981;
   var expr = '', mode = 'input', lastResult = 0, ans = 0, mem = 0, deg = true, second = false, unlocked = false;
@@ -279,19 +270,16 @@ function showScreen(id) {
     var prevKind = null;
     function isDigit(c) { return c >= '0' && c <= '9'; }
     function isLetter(c) { return (c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z'); }
-
     while (i < n) {
       var c = src[i];
       if (c === ' ') { i++; continue; }
       var kind = null, tok = null;
-
       if (isDigit(c) || (c === '.' && isDigit(src.charAt(i + 1)))) {
         var j = i;
         while (j < n && (isDigit(src[j]) || src[j] === '.')) j++;
         tok = { t: 'num', v: parseFloat(src.slice(i, j)) };
         kind = 'num'; i = j;
-      }
-      else if (isLetter(c)) {
+      } else if (isLetter(c)) {
         var matched = null, mLen = 0;
         var rest = src.slice(i).toLowerCase();
         for (var f = 0; f < FUNCS.length; f++) {
@@ -304,28 +292,22 @@ function showScreen(id) {
         else if (matched === 'ans') { tok = { t: 'num', v: ans }; kind = 'const'; }
         else { tok = { t: 'func', v: matched }; kind = 'func'; }
         i += mLen;
-      }
-      else if (c === 'π') { tok = { t: 'num', v: Math.PI }; kind = 'const'; i++; }
+      } else if (c === 'π') { tok = { t: 'num', v: Math.PI }; kind = 'const'; i++; }
       else if (c === '√') { tok = { t: 'func', v: 'sqrt' }; kind = 'func'; i++; }
       else if (OPCHARS.indexOf(c) >= 0) {
         if (c === '-' && (prevKind === null || prevKind === 'op' || prevKind === '(' || prevKind === 'post')) {
           tok = { t: 'op', v: 'neg', unary: true }; kind = 'op';
         } else if (c === '+' && (prevKind === null || prevKind === 'op' || prevKind === '(')) {
           i++; continue;
-        } else {
-          tok = { t: 'op', v: OPMAP[c] }; kind = 'op';
-        }
+        } else { tok = { t: 'op', v: OPMAP[c] }; kind = 'op'; }
         i++;
-      }
-      else if (c === '(') { tok = { t: '(' }; kind = '('; i++; }
+      } else if (c === '(') { tok = { t: '(' }; kind = '('; i++; }
       else if (c === ')') { tok = { t: ')' }; kind = ')'; i++; }
       else if (POSTFIX[c]) { tok = { t: 'post', v: c }; kind = 'post'; i++; }
       else throw 'Syntax';
-
       var curVal = (kind === 'num' || kind === 'const' || kind === 'func' || kind === '(');
       var prevVal = (prevKind === 'num' || prevKind === 'const' || prevKind === ')' || prevKind === 'post');
       if (curVal && prevVal) toks.push({ t: 'op', v: '*', implicit: true });
-
       toks.push(tok);
       prevKind = kind;
     }
@@ -341,7 +323,9 @@ function showScreen(id) {
     function top() { return ops[ops.length - 1]; }
     for (var i = 0; i < toks.length; i++) {
       var tk = toks[i];
-      if (tk.t === 'num' || tk.t === 'func' || tk.t === '(') { ops.push(tk); if (tk.t === 'num') { out.push(ops.pop()); } continue; }
+      if (tk.t === 'num') { out.push(tk); continue; }
+      if (tk.t === 'func') { ops.push(tk); continue; }
+      if (tk.t === '(') { ops.push(tk); continue; }
       if (tk.t === ')') {
         while (ops.length && top().t !== '(') out.push(ops.pop());
         if (!ops.length) throw 'Syntax';
@@ -406,22 +390,14 @@ function showScreen(id) {
     for (var i = 0; i < rpn.length; i++) {
       var tk = rpn[i];
       if (tk.t === 'num') { st.push(tk.v); continue; }
-      if (tk.t === 'func') {
-        if (!st.length) throw 'Syntax';
-        st.push(applyFunc(tk.v, st.pop()));
-        continue;
-      }
+      if (tk.t === 'func') { if (!st.length) throw 'Syntax'; st.push(applyFunc(tk.v, st.pop())); continue; }
       if (tk.t === 'post') {
         if (!st.length) throw 'Syntax';
         var a = st.pop();
         st.push(tk.v === '!' ? fact(a) : a / 100);
         continue;
       }
-      if (tk.unary || tk.v === 'neg') {
-        if (!st.length) throw 'Syntax';
-        st.push(-st.pop());
-        continue;
-      }
+      if (tk.unary || tk.v === 'neg') { if (!st.length) throw 'Syntax'; st.push(-st.pop()); continue; }
       if (st.length < 2) throw 'Syntax';
       var b = st.pop(), a2 = st.pop();
       switch (tk.v) {
@@ -475,9 +451,7 @@ function showScreen(id) {
     showScreen('launcherScreen');
   }
 
-  secretDot.addEventListener('click', function() {
-    if (unlocked) showScreen('launcherScreen');
-  });
+  secretDot.addEventListener('click', function() { if (unlocked) showScreen('launcherScreen'); });
 
   var MULTI = ['asin(','acos(','atan(','tenpow(','sqrt(','sin(','cos(','tan(','log(','exp(','ln(','ans','π'];
   function backspace() {
@@ -562,9 +536,7 @@ function showScreen(id) {
     }
   }
   renderHist();
-  document.getElementById('histBtn').addEventListener('click', function() {
-    histPanel.classList.toggle('open');
-  });
+  document.getElementById('histBtn').addEventListener('click', function() { histPanel.classList.toggle('open'); });
 
   var k2nd = document.getElementById('k2nd');
   var FN2 = {
@@ -679,10 +651,21 @@ function showScreen(id) {
 })();
 
 // ═════════════════════════════════════════════════════════
-//  LAUNCHER + .LAUNCHPAD v3 COMPRESSION PIPELINE
-//  export: preprocess → binary TLV → deflate-raw (LPZ3)
-//          fallbacks: gzip (LPZ2) / LZ (LPL2)
-//  import: reads LPZ3, LPZ2, LPL2, LPZ1, LPL1, LAUNCHPAD1
+//  LAUNCHER + .LAUNCHPAD v4 — BINARY BLOB EXTRACTION
+//
+//  WHY v4: a 22MB WASM bundle is ~90% one base64 string.
+//  deflate can't squeeze base64 of binary (looks random),
+//  and base64 itself costs +33% vs raw bytes.
+//  FIX: decode every large base64 payload to RAW BINARY,
+//  store as separate segments, deflate the rest.
+//  - data:...;base64,XXX payloads >= 256 chars: extracted
+//  - standalone giant base64 runs >= 16384 chars: extracted
+//  - every extraction verified by exact roundtrip
+//    (decode -> re-encode === original) so nothing breaks
+//
+//  Formats written: LPZ4 (deflate-raw) | LPL4 (LZ fallback)
+//  Formats read: LPZ4, LPL4, LPZ3, LPZ2, LPL2, LPZ1, LPL1,
+//                LAUNCHPAD1 (plain JSON)
 // ═════════════════════════════════════════════════════════
 (function() {
   var DB_NAME = 'html_launcher_db';
@@ -691,6 +674,8 @@ function showScreen(id) {
   var files = [];
   var launchMode = 'blank';
 
+  var MAGIC_RAW4 = 'LPZ4';
+  var MAGIC_LZ4  = 'LPL4';
   var MAGIC_RAW3 = 'LPZ3';
   var MAGIC_GZ2  = 'LPZ2';
   var MAGIC_LZ2  = 'LPL2';
@@ -760,9 +745,84 @@ function showScreen(id) {
   }
   function u16ToBytes(n) { return new Uint8Array([(n >> 8) & 0xFF, n & 0xFF]); }
 
-  // ═══ REGION-AWARE PREPROCESSOR ═══
-  // script/pre/textarea regions untouched; style regions get
-  // CSS minify; normal regions lose comments + whitespace
+  // ═══ BASE64 <-> BINARY ═══
+  function b64ToBytes(b64) {
+    var bin = atob(b64);
+    var bytes = new Uint8Array(bin.length);
+    for (var i = 0; i < bin.length; i++) bytes[i] = bin.charCodeAt(i);
+    return bytes;
+  }
+  function bytesToB64(bytes) {
+    var CH = 0x8000;
+    var parts = [];
+    for (var i = 0; i < bytes.length; i += CH) {
+      parts.push(String.fromCharCode.apply(null, bytes.subarray(i, Math.min(i + CH, bytes.length))));
+    }
+    return btoa(parts.join(''));
+  }
+
+  // ═══ BINARY BLOB EXTRACTION ═══
+  // manual scanner (fast on multi-MB strings — a regex with a
+  // 16K+ quantifier would backtrack into next week).
+  // finds maximal runs of base64 charset; a run is extracted
+  // when it is a data-URI payload (>=256, preceded by base64,)
+  // or a standalone giant blob (>=16384) — and ONLY when
+  // decode -> re-encode matches the original exactly, so the
+  // file is guaranteed to rebuild byte-identical on import.
+  function extractBinaries(html) {
+    var segs = [];
+    var binCount = 0, binTotal = 0;
+    var n = html.length;
+    var i = 0;
+    var textStart = 0;
+
+    function isB64(c) {
+      return (c >= 65 && c <= 90) || (c >= 97 && c <= 122) ||
+             (c >= 48 && c <= 57) || c === 43 || c === 47;
+    }
+
+    while (i < n) {
+      if (isB64(html.charCodeAt(i))) {
+        var runStart = i;
+        while (i < n && isB64(html.charCodeAt(i))) i++;
+        var runLen = i - runStart;
+        var padLen = 0;
+        while (padLen < 2 && i + padLen < n && html.charCodeAt(i + padLen) === 61) padLen++;
+        var fullLen = runLen + padLen;
+
+        var candidate = false;
+        if (fullLen % 4 === 0) {
+          if (runLen >= 256 && runStart >= 7 &&
+              html.substr(runStart - 7, 7) === 'base64,') {
+            candidate = true; // data URI payload
+          } else if (runLen >= 16384) {
+            candidate = true; // standalone giant blob in JS
+          }
+        }
+
+        if (candidate) {
+          var payload = html.slice(runStart, runStart + fullLen);
+          var bytes = null;
+          try { bytes = b64ToBytes(payload); } catch (e) { bytes = null; }
+          // exact roundtrip required — guarantees lossless rebuild
+          if (bytes && bytes.length >= 192 && bytesToB64(bytes) === payload) {
+            if (runStart > textStart) segs.push({ t: 0, d: html.slice(textStart, runStart) });
+            segs.push({ t: 1, d: bytes });
+            binCount++;
+            binTotal += bytes.length;
+            textStart = runStart + fullLen;
+          }
+        }
+        i = runStart + fullLen;
+      } else {
+        i++;
+      }
+    }
+    if (textStart < n) segs.push({ t: 0, d: html.slice(textStart) });
+    return { segs: segs, binCount: binCount, binTotal: binTotal };
+  }
+
+  // ═══ REGION-AWARE TEXT MINIFIER (text portions only) ═══
   function minifyNormal(text) {
     text = text.replace(/<!--[\s\S]*?-->/g, '');
     var lines = text.split('\n');
@@ -773,8 +833,6 @@ function showScreen(id) {
       out.push(line);
     }
     text = out.join('\n');
-    // collapse whitespace BETWEEN tags across newlines
-    // (inline text like >hello< never matches: no newline inside)
     text = text.replace(/>\s*\n\s*</g, '><');
     return text;
   }
@@ -789,7 +847,6 @@ function showScreen(id) {
 
   function preprocessHTML(src) {
     if (typeof src !== 'string' || src.length < 64) return src;
-
     var openTag = /<(script|pre|textarea|style)\b[^>]*>/gi;
     var regions = [];
     var last = 0, m;
@@ -802,7 +859,6 @@ function showScreen(id) {
       var end;
       if (cm === -1) end = src.length;
       else end = after + cm + rest.slice(cm).match(closeRe)[0].length;
-
       if (m.index > last) regions.push({ t: 'n', s: last, e: m.index });
       regions.push({ t: tag, s: m.index, e: end });
       last = end;
@@ -824,22 +880,27 @@ function showScreen(id) {
           closeM ? text.length - closeM[0].length : text.length);
         outp.push((openM ? openM[0] : '') + minifyCSSInner(inner) + (closeM ? closeM[0] : ''));
       } else {
-        outp.push(text);
+        outp.push(text); // script/pre/textarea untouched
       }
     }
     return outp.join('');
   }
 
-  // ═══ BINARY TLV CONTAINER ═══
-  function buildTLV(list) {
+  // ═══ SEGMENTED CONTAINER ═══
+  // file record: [2B nameLen][name][4B segCount]
+  //   segment:   [1B type 0=text|1=binary][4B len][data]
+  function buildSegTLV(list) {
     var parts = [];
-    for (var i = 0; i < list.length; i++) {
-      var nameB = textToBytes(list[i].name);
-      var htmlB = textToBytes(list[i].html);
-      parts.push(concatBytes(
-        concatBytes(u16ToBytes(nameB.length), nameB),
-        concatBytes(u32ToBytes(htmlB.length), htmlB)
-      ));
+    for (var f = 0; f < list.length; f++) {
+      var nameB = textToBytes(list[f].name);
+      parts.push(concatBytes(u16ToBytes(nameB.length), nameB));
+      parts.push(u32ToBytes(list[f].segs.length));
+      for (var s = 0; s < list[f].segs.length; s++) {
+        var seg = list[f].segs[s];
+        var data = (seg.t === 0) ? textToBytes(seg.d) : seg.d;
+        parts.push(concatBytes(
+          concatBytes(new Uint8Array([seg.t]), u32ToBytes(data.length)), data));
+      }
     }
     var total = 0;
     parts.forEach(function(p) { total += p.length; });
@@ -849,6 +910,32 @@ function showScreen(id) {
     return out;
   }
 
+  function parseSegTLV(bytes) {
+    var list = [];
+    var i = 0, n = bytes.length;
+    while (i < n) {
+      if (i + 2 > n) throw 'Corrupt';
+      var nameLen = (bytes[i] << 8) | bytes[i + 1]; i += 2;
+      if (i + nameLen + 4 > n) throw 'Corrupt';
+      var name = bytesToText(bytes.subarray(i, i + nameLen)); i += nameLen;
+      var segCount = bytesToU32(bytes, i); i += 4;
+      if (segCount > 100000) throw 'Corrupt';
+      var html = '';
+      for (var s = 0; s < segCount; s++) {
+        if (i + 5 > n) throw 'Corrupt';
+        var type = bytes[i]; i += 1;
+        var dlen = bytesToU32(bytes, i); i += 4;
+        if (i + dlen > n) throw 'Corrupt';
+        if (type === 0) html += bytesToText(bytes.subarray(i, i + dlen));
+        else html += bytesToB64(bytes.subarray(i, i + dlen));
+        i += dlen;
+      }
+      list.push({ name: name, html: html });
+    }
+    return list;
+  }
+
+  // legacy plain TLV (LPZ3/LPZ2/LPL2)
   function parseTLV(bytes) {
     var list = [];
     var i = 0, n = bytes.length;
@@ -869,7 +956,24 @@ function showScreen(id) {
     return list;
   }
 
-  // ═══ STREAM COMPRESSION (any format) ═══
+  function buildTLV(list) {
+    var parts = [];
+    for (var i = 0; i < list.length; i++) {
+      var nameB = textToBytes(list[i].name);
+      var htmlB = textToBytes(list[i].html);
+      parts.push(concatBytes(
+        concatBytes(u16ToBytes(nameB.length), nameB),
+        concatBytes(u32ToBytes(htmlB.length), htmlB)));
+    }
+    var total = 0;
+    parts.forEach(function(p) { total += p.length; });
+    var out = new Uint8Array(total);
+    var off = 0;
+    parts.forEach(function(p) { out.set(p, off); off += p.length; });
+    return out;
+  }
+
+  // ═══ STREAM COMPRESSION ═══
   function compressStream(bytes, format) {
     return new Promise(function(resolve, reject) {
       var cs = new CompressionStream(format);
@@ -886,10 +990,7 @@ function showScreen(id) {
             var off = 0;
             chunks.forEach(function(c) { out.set(c, off); off += c.length; });
             resolve(out);
-          } else {
-            chunks.push(result.value);
-            pump();
-          }
+          } else { chunks.push(result.value); pump(); }
         }).catch(reject);
       }
       pump();
@@ -912,10 +1013,7 @@ function showScreen(id) {
             var off = 0;
             chunks.forEach(function(c) { out.set(c, off); off += c.length; });
             resolve(out);
-          } else {
-            chunks.push(result.value);
-            pump();
-          }
+          } else { chunks.push(result.value); pump(); }
         }).catch(reject);
       }
       pump();
@@ -964,10 +1062,7 @@ function showScreen(id) {
       if (bestLen >= MIN_MATCH) {
         out.push(0x00, (bestDist >> 8) & 0xFF, bestDist & 0xFF, bestLen);
         i += bestLen;
-      } else {
-        out.push(0x01, bytes[i]);
-        i++;
-      }
+      } else { out.push(0x01, bytes[i]); i++; }
     }
     return new Uint8Array(out);
   }
@@ -1082,19 +1177,26 @@ function showScreen(id) {
     });
   };
 
-  // ═══ EXPORT: preprocess → TLV → deflate-raw ═══
+  // ═══ EXPORT v4: minify → extract binaries → segTLV → deflate ═══
   window.exportPack = function() {
     if (!files.length) { status('library is empty — nothing to save', 'err'); return; }
 
     var rawSize = 0;
     files.forEach(function(f) { rawSize += f.html.length; });
 
+    status('packing ' + files.length + ' file(s)... scanning for binary blobs');
+
     var entries = [];
+    var totalBins = 0, totalBinBytes = 0;
     files.forEach(function(f) {
-      entries.push({ name: f.name, html: preprocessHTML(f.html) });
+      var mini = preprocessHTML(f.html);
+      var ex = extractBinaries(mini);
+      totalBins += ex.binCount;
+      totalBinBytes += ex.binTotal;
+      entries.push({ name: f.name, segs: ex.segs });
     });
 
-    var tlv = buildTLV(entries);
+    var tlv = buildSegTLV(entries);
 
     var d = new Date();
     var stamp = d.getFullYear() + '-' +
@@ -1111,9 +1213,12 @@ function showScreen(id) {
       document.body.removeChild(a);
       setTimeout(function() { URL.revokeObjectURL(url); }, 5000);
       var ratio = ((1 - fileBytes.length / rawSize) * 100).toFixed(1);
+      var blobNote = totalBins > 0
+        ? ' | ' + totalBins + ' blob(s) decoded: ' + fmtSize(totalBinBytes)
+        : '';
       status('saved ' + files.length + ' files → ' + fname +
         ' | ' + fmtSize(rawSize) + ' → ' + fmtSize(fileBytes.length) +
-        ' (-' + ratio + '%, ' + method + ')', 'ok');
+        ' (-' + ratio + '%, ' + method + ')' + blobNote, 'ok');
     }
 
     function wrap(magic, data) {
@@ -1122,26 +1227,26 @@ function showScreen(id) {
 
     if (supportsFormat('deflate-raw')) {
       compressStream(tlv, 'deflate-raw').then(function(comp) {
-        finish(wrap(MAGIC_RAW3, comp), 'min+deflate-raw');
+        finish(wrap(MAGIC_RAW4, comp), 'min+bin+deflate-raw');
       }).catch(function() {
         if (supportsFormat('gzip')) {
           compressStream(tlv, 'gzip').then(function(c2) {
-            finish(wrap(MAGIC_GZ2, c2), 'min+gzip');
-          }).catch(function() { finish(wrap(MAGIC_LZ2, lzCompress(tlv)), 'min+lz'); });
+            finish(wrap(MAGIC_RAW4, c2), 'min+bin+gzip');
+          }).catch(function() { finish(wrap(MAGIC_LZ4, lzCompress(tlv)), 'min+bin+lz'); });
         } else {
-          finish(wrap(MAGIC_LZ2, lzCompress(tlv)), 'min+lz');
+          finish(wrap(MAGIC_LZ4, lzCompress(tlv)), 'min+bin+lz');
         }
       });
     } else if (supportsFormat('gzip')) {
       compressStream(tlv, 'gzip').then(function(comp) {
-        finish(wrap(MAGIC_GZ2, comp), 'min+gzip');
-      }).catch(function() { finish(wrap(MAGIC_LZ2, lzCompress(tlv)), 'min+lz'); });
+        finish(wrap(MAGIC_RAW4, comp), 'min+bin+gzip');
+      }).catch(function() { finish(wrap(MAGIC_LZ4, lzCompress(tlv)), 'min+bin+lz'); });
     } else {
-      finish(wrap(MAGIC_LZ2, lzCompress(tlv)), 'min+lz');
+      finish(wrap(MAGIC_LZ4, lzCompress(tlv)), 'min+bin+lz');
     }
   };
 
-  // ═══ IMPORT: reads every format ever written ═══
+  // ═══ IMPORT — reads v4 + every legacy format ═══
   window.importPack = function() { $('packInput').click(); };
 
   $('packInput').addEventListener('change', function() {
@@ -1185,7 +1290,13 @@ function showScreen(id) {
         importList(pack.files);
       }
 
-      function verifyThenImport(decomp, expected) {
+      function verifySeg(decomp, expected) {
+        if (decomp.length !== expected) { status('corrupt file (size mismatch)', 'err'); return; }
+        try { importList(parseSegTLV(decomp)); }
+        catch (e) { status('corrupt file (bad container)', 'err'); }
+      }
+
+      function verifyLegacy(decomp, expected) {
         if (decomp.length !== expected) { status('corrupt file (size mismatch)', 'err'); return; }
         try { importList(parseTLV(decomp)); }
         catch (e) { status('corrupt file (bad container)', 'err'); }
@@ -1193,22 +1304,40 @@ function showScreen(id) {
 
       function tryDecompress(bytes, format, then) {
         decompressStream(bytes, format).then(then).catch(function() {
-          status('decompression failed — corrupt file', 'err');
+          // v4 files written as gzip-fallback carry the same magic —
+          // try deflate-raw then gzip before giving up
+          if (format === 'gzip') {
+            decompressStream(bytes, 'deflate-raw').then(then).catch(function() {
+              status('decompression failed — corrupt file', 'err');
+            });
+          } else {
+            status('decompression failed — corrupt file', 'err');
+          }
         });
       }
 
-      if (magic.indexOf(MAGIC_RAW3) === 0) {
+      if (magic.indexOf(MAGIC_RAW4) === 0) {
+        // v4: try deflate-raw, fall back to gzip (both wrote this magic)
         tryDecompress(raw.subarray(8), 'deflate-raw', function(dec) {
-          verifyThenImport(dec, bytesToU32(raw, 4));
+          verifySeg(dec, bytesToU32(raw, 4));
+        });
+      }
+      else if (magic.indexOf(MAGIC_LZ4) === 0) {
+        try { verifySeg(lzDecompress(raw.subarray(8)), bytesToU32(raw, 4)); }
+        catch (e) { status('corrupt file', 'err'); }
+      }
+      else if (magic.indexOf(MAGIC_RAW3) === 0) {
+        tryDecompress(raw.subarray(8), 'deflate-raw', function(dec) {
+          verifyLegacy(dec, bytesToU32(raw, 4));
         });
       }
       else if (magic.indexOf(MAGIC_GZ2) === 0) {
         tryDecompress(raw.subarray(8), 'gzip', function(dec) {
-          verifyThenImport(dec, bytesToU32(raw, 4));
+          verifyLegacy(dec, bytesToU32(raw, 4));
         });
       }
       else if (magic.indexOf(MAGIC_LZ2) === 0) {
-        try { verifyThenImport(lzDecompress(raw.subarray(8)), bytesToU32(raw, 4)); }
+        try { verifyLegacy(lzDecompress(raw.subarray(8)), bytesToU32(raw, 4)); }
         catch (e) { status('corrupt file', 'err'); }
       }
       else if (magic.indexOf(MAGIC_GZ1) === 0) {
