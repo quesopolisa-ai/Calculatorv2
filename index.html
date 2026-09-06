@@ -9,200 +9,202 @@
   * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
   html, body { height: 100%; }
   body {
-    background: #0c0c0f; color: #e8e8ec;
+    background: #06080d; color: #d8e4ff;
     font-family: 'Segoe UI', Roboto, sans-serif;
     overflow: hidden;
   }
   .screen {
     position: fixed; inset: 0; overflow-y: auto;
     display: flex; align-items: center; justify-content: center;
-    padding: 16px;
+    padding: 12px;
     opacity: 0; pointer-events: none; transform: scale(.985);
     transition: opacity .25s ease, transform .25s ease;
   }
   .screen.active { opacity: 1; pointer-events: auto; transform: scale(1); }
 
-  /* ═══════════ CALCULATOR ═══════════ */
-  .calc { width: 100%; max-width: 380px; user-select: none; }
+  /* ═══════════ CALCULATOR — compact blue/black ═══════════ */
+  .calc {
+    width: 100%; max-width: 296px; user-select: none;
+    background: #0a0e18;
+    border: 2px solid #1e3a5f;
+    border-radius: 16px;
+    padding: 12px 10px 14px;
+    box-shadow: 0 0 0 1px #0a1526, 0 14px 40px rgba(0,0,0,.6);
+  }
   .brandrow {
     display: flex; justify-content: space-between; align-items: center;
-    margin-bottom: 10px;
+    margin-bottom: 8px; padding: 0 4px;
   }
-  .brand { font-size: 15px; font-weight: 700; letter-spacing: 2px; color: #888; }
+  .brand {
+    font-size: 11px; font-weight: 700; letter-spacing: 2px;
+    color: #4a7ec2; text-transform: uppercase;
+  }
   .histbtn {
-    background: none; border: none; color: #555; font-size: 11px;
+    background: none; border: none; color: #34558a; font-size: 10px;
     font-weight: 700; letter-spacing: 1px; cursor: pointer;
   }
-  .histbtn:hover { color: #999; }
+  .histbtn:hover { color: #6ea8ff; }
 
   .display {
     position: relative;
-    background: #15151a; border: 1px solid #232329; border-radius: 12px;
-    padding: 18px 16px 14px; margin-bottom: 12px; text-align: right;
+    background: #070b14; border: 1px solid #16305a; border-radius: 10px;
+    padding: 12px 12px 10px; margin-bottom: 10px; text-align: right;
   }
   .d-small {
-    min-height: 18px; font-size: 14px; color: #5a5a66;
+    min-height: 14px; font-size: 11px; color: #4a6a99;
     font-family: Consolas, monospace; word-break: break-all;
     overflow-x: auto; white-space: nowrap;
   }
   .d-big {
-    font-size: 34px; font-weight: 300; margin-top: 4px;
+    font-size: 26px; font-weight: 300; margin-top: 2px;
     font-family: Consolas, monospace; word-break: break-all;
     overflow-x: auto; white-space: nowrap; line-height: 1.15;
+    color: #e8f1ff; text-shadow: 0 0 12px rgba(74,158,255,.25);
   }
-  .d-big.err { color: #ff6b6b; font-size: 22px; }
+  .d-big.err { color: #ff6b8a; font-size: 16px; text-shadow: none; }
   .d-flags {
-    position: absolute; top: 8px; left: 12px;
-    font-size: 10px; color: #555; font-weight: 700; letter-spacing: 1px;
-    display: flex; gap: 8px;
+    position: absolute; top: 6px; left: 10px;
+    font-size: 9px; color: #34558a; font-weight: 700; letter-spacing: 1px;
+    display: flex; gap: 6px;
   }
   #secretDot {
-    position: absolute; top: 9px; right: 12px;
-    width: 7px; height: 7px; border-radius: 50%;
-    background: #3a3a44; cursor: pointer; display: none;
+    position: absolute; top: 7px; right: 10px;
+    width: 6px; height: 6px; border-radius: 50%;
+    background: #1a2c4a; cursor: pointer; display: none;
   }
   #secretDot.on { display: block; }
-  #secretDot:hover { background: #c62f2f; }
+  #secretDot:hover { background: #4a9eff; }
 
   .histpanel {
-    display: none; background: #131318; border: 1px solid #232329;
-    border-radius: 10px; margin-bottom: 12px; padding: 6px;
-    max-height: 180px; overflow-y: auto;
+    display: none; background: #070b14; border: 1px solid #14264a;
+    border-radius: 8px; margin-bottom: 10px; padding: 4px;
+    max-height: 150px; overflow-y: auto;
   }
   .histpanel.open { display: block; }
-  .hitem {
-    padding: 8px 10px; border-radius: 6px; cursor: pointer;
-    font-family: Consolas, monospace; font-size: 12px;
-  }
-  .hitem:hover { background: #1d1d24; }
-  .hitem .he { color: #666; word-break: break-all; }
-  .hitem .hr { color: #e8e8ec; font-size: 14px; }
-  .hempty { color: #444; font-size: 11px; text-align: center; padding: 12px; }
+  .hitem { padding: 6px 8px; border-radius: 5px; cursor: pointer; font-family: Consolas, monospace; font-size: 11px; }
+  .hitem:hover { background: #0d1626; }
+  .hitem .he { color: #3a5a8a; word-break: break-all; }
+  .hitem .hr { color: #cfe1ff; font-size: 12px; }
+  .hempty { color: #22344f; font-size: 10px; text-align: center; padding: 10px; }
 
-  .keypad { display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px; }
+  .keypad { display: grid; grid-template-columns: repeat(5, 1fr); gap: 6px; }
   .k {
-    height: 58px; border: none; border-radius: 10px; cursor: pointer;
-    font-size: 19px; font-weight: 600; color: #e8e8ec;
-    background: #1a1a20; transition: background .1s, transform .05s;
+    height: 44px; border: 1px solid #14264a; border-radius: 9px; cursor: pointer;
+    font-size: 15px; font-weight: 600; color: #d8e4ff;
+    background: #101a30; transition: background .1s, transform .05s;
     font-family: inherit;
   }
-  .k:active { transform: scale(.93); }
-  .k.fn  { background: #14141a; color: #7a7a88; font-size: 15px; }
-  .k.fn:hover { background: #1c1c24; }
-  .k.op  { background: #20202a; color: #ff8a8a; font-size: 21px; }
-  .k.op:hover { background: #2a2a36; }
-  .k.num { background: #22222a; font-size: 21px; }
-  .k.num:hover { background: #2c2c36; }
-  .k.util { background: #14141a; color: #8888a0; font-size: 15px; }
-  .k.util:hover { background: #1c1c24; }
-  .k.eq { grid-column: span 2; background: #c62f2f; color: #fff; font-size: 23px; }
-  .k.eq:hover { background: #e03a3a; }
-  .k.second-on { background: #3a2a10 !important; color: #ffc46b !important; }
+  .k:active { transform: scale(.92); }
+  .k.fn  { background: #0c1526; color: #5a86c2; font-size: 12px; border-color: #12223f; }
+  .k.fn:hover { background: #12203a; color: #8ab8ff; }
+  .k.op  { background: #14264a; color: #6ea8ff; font-size: 17px; border-color: #1d3660; }
+  .k.op:hover { background: #1a3055; }
+  .k.num { background: #131f38; font-size: 17px; border-color: #1a2c4f; }
+  .k.num:hover { background: #1a2a48; }
+  .k.util { background: #0c1526; color: #4a6a99; font-size: 12px; border-color: #12223f; }
+  .k.util:hover { background: #12203a; color: #7aa0d8; }
+  .k.eq { grid-column: span 2; background: #1d5fd6; color: #fff; font-size: 18px; border-color: #2b6fe0; }
+  .k.eq:hover { background: #2b6fe0; }
+  .k.second-on { background: #1a3a6a !important; color: #6ea8ff !important; border-color: #2a4a80 !important; }
 
-  /* ═══════════ LAUNCHER ═══════════ */
+  /* ═══════════ LAUNCHER (blue/black to match) ═══════════ */
   .wrap { width: 100%; max-width: 560px; }
   header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; }
-  h1 { font-size: 20px; letter-spacing: 1px; }
-  h1 span { color: #ff5c5c; }
+  h1 { font-size: 20px; letter-spacing: 1px; color: #e8f1ff; }
+  h1 span { color: #4a9eff; }
   .storebtn {
-    background: #1e1e26; border: 1px solid #3a3a46; color: #ccc;
+    background: #0c1526; border: 1px solid #1e3a5f; color: #8ab8ff;
     border-radius: 6px; padding: 8px 14px; font-size: 12px; font-weight: 600; cursor: pointer;
   }
-  .storebtn:hover { background: #26262e; color: #fff; }
-  .lockbtn {
-    background: none; border: none; color: #444; font-size: 20px; cursor: pointer;
-    line-height: 1; padding: 0 10px 0 0;
-  }
-  .lockbtn:hover { color: #888; }
+  .storebtn:hover { background: #12203a; color: #cfe1ff; }
+  .lockbtn { background: none; border: none; color: #22344f; font-size: 20px; cursor: pointer; line-height: 1; padding: 0 10px 0 0; }
+  .lockbtn:hover { color: #4a9eff; }
   .hgroup { display: flex; gap: 8px; }
 
   .addbox {
-    background: #17171c; border: 2px dashed #2c2c36; border-radius: 10px;
+    background: #0a0e18; border: 2px dashed #1e3a5f; border-radius: 10px;
     padding: 26px 16px; text-align: center; margin-bottom: 14px;
     cursor: pointer; transition: border-color .15s;
   }
-  .addbox:hover, .addbox.drag { border-color: #ff5c5c; }
-  .addbox .big { font-size: 26px; line-height: 1; margin-bottom: 8px; }
-  .addbox .t1 { font-size: 14px; font-weight: 600; }
-  .addbox .t2 { font-size: 11px; color: #666; margin-top: 4px; }
+  .addbox:hover, .addbox.drag { border-color: #4a9eff; }
+  .addbox .big { font-size: 26px; line-height: 1; margin-bottom: 8px; color: #4a9eff; }
+  .addbox .t1 { font-size: 14px; font-weight: 600; color: #cfe1ff; }
+  .addbox .t2 { font-size: 11px; color: #3a5a8a; margin-top: 4px; }
 
   .listhead { display: flex; justify-content: space-between; align-items: center; margin: 4px 0 8px; }
-  .listhead span { font-size: 11px; color: #666; letter-spacing: 1px; font-weight: 600; }
-  .clearall { background: none; border: none; color: #ff6b6b; font-size: 11px; cursor: pointer; }
+  .listhead span { font-size: 11px; color: #3a5a8a; letter-spacing: 1px; font-weight: 600; }
+  .clearall { background: none; border: none; color: #ff6b8a; font-size: 11px; cursor: pointer; }
   .filecard {
-    background: #17171c; border: 1px solid #26262e; border-radius: 8px;
+    background: #0a0e18; border: 1px solid #16305a; border-radius: 8px;
     padding: 12px 14px; margin-bottom: 8px;
     display: flex; align-items: center; gap: 12px;
   }
   .ficon {
     width: 38px; height: 38px; flex-shrink: 0; border-radius: 8px;
-    background: #1e1e26; display: flex; align-items: center; justify-content: center;
-    font-size: 16px; color: #ff5c5c; font-weight: 700;
+    background: #0c1526; display: flex; align-items: center; justify-content: center;
+    font-size: 16px; color: #4a9eff; font-weight: 700;
   }
   .fmeta { flex: 1; min-width: 0; }
-  .fname { font-size: 13px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-  .finfo { font-size: 10px; color: #666; margin-top: 3px; font-family: Consolas, monospace; }
+  .fname { font-size: 13px; font-weight: 600; color: #e8f1ff; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .finfo { font-size: 10px; color: #3a5a8a; margin-top: 3px; font-family: Consolas, monospace; }
   .fbtns { display: flex; gap: 6px; flex-shrink: 0; }
   .runbtn {
-    background: #c62f2f; color: #fff; border: none; border-radius: 6px;
+    background: #1d5fd6; color: #fff; border: none; border-radius: 6px;
     padding: 9px 18px; font-size: 12px; font-weight: 700; cursor: pointer;
   }
-  .runbtn:hover { background: #e03a3a; }
+  .runbtn:hover { background: #2b6fe0; }
   .rembtn {
-    background: #1e1e26; color: #ff6b6b; border: 1px solid #3a3a46;
+    background: #0c1526; color: #ff6b8a; border: 1px solid #3a2540;
     border-radius: 6px; padding: 9px 12px; font-size: 12px; font-weight: 700; cursor: pointer;
   }
-  .rembtn:hover { background: #2c1e1e; }
-  .empty { text-align: center; color: #444; font-size: 12px; padding: 30px 0; }
+  .rembtn:hover { background: #1a1520; }
+  .empty { text-align: center; color: #22344f; font-size: 12px; padding: 30px 0; }
 
-  /* ═══════════ SAVE SYSTEM (.launchpad) ═══════════ */
-  .packrow {
-    display: flex; gap: 8px; margin-bottom: 8px;
-  }
+  .packrow { display: flex; gap: 8px; margin-bottom: 8px; }
   .packbtn {
     flex: 1; padding: 11px 8px; border-radius: 8px; font-size: 12px;
     font-weight: 700; cursor: pointer; letter-spacing: .5px;
-    background: #1a2a1e; color: #6fcf6f; border: 1px solid #2a4a30;
+    background: #0c1e30; color: #4adeff; border: 1px solid #16455a;
   }
-  .packbtn:hover { background: #223a28; }
-  .packbtn.red { background: #2a2026; color: #e8a0e8; border: 1px solid #4a3040; }
-  .packbtn.red:hover { background: #362830; }
+  .packbtn:hover { background: #12283f; }
+  .packbtn.red { background: #1a1526; color: #b08aff; border: 1px solid #34285a; }
+  .packbtn.red:hover { background: #241c38; }
 
   .settings {
-    background: #17171c; border: 1px solid #26262e; border-radius: 10px;
+    background: #0a0e18; border: 1px solid #16305a; border-radius: 10px;
     padding: 14px; margin-top: 14px; display: none;
   }
   .settings.open { display: block; }
-  .settings h2 { font-size: 11px; color: #888; letter-spacing: 1px; margin-bottom: 10px; }
+  .settings h2 { font-size: 11px; color: #4a6a99; letter-spacing: 1px; margin-bottom: 10px; }
   .setrow { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; gap: 8px; }
-  .setrow label { font-size: 12px; color: #aaa; }
-  .setrow .hint { font-size: 10px; color: #555; display: block; margin-top: 2px; }
+  .setrow label { font-size: 12px; color: #8ab8ff; }
+  .setrow .hint { font-size: 10px; color: #34558a; display: block; margin-top: 2px; }
   .seg { display: flex; gap: 4px; flex-shrink: 0; }
   .seg button {
-    background: #1e1e26; border: 1px solid #2c2c36; color: #888;
+    background: #0c1526; border: 1px solid #16305a; color: #5a86c2;
     border-radius: 4px; padding: 7px 12px; font-size: 11px; font-weight: 600; cursor: pointer;
   }
-  .seg button.active { background: #26262e; color: #fff; border-color: #3a3a46; }
+  .seg button.active { background: #14264a; color: #fff; border-color: #2a4a80; }
   .cloakrow { display: flex; gap: 6px; margin-bottom: 10px; }
   .cloakrow input {
-    flex: 1; background: #101014; border: 1px solid #2c2c36; color: #e8e8ec;
+    flex: 1; background: #070b14; border: 1px solid #16305a; color: #d8e4ff;
     border-radius: 4px; padding: 9px; font-size: 12px; outline: none;
   }
-  .checkrow { display: flex; gap: 16px; font-size: 12px; color: #888; }
-  .checkrow input { accent-color: #ff5c5c; }
+  .checkrow { display: flex; gap: 16px; font-size: 12px; color: #4a6a99; }
+  .checkrow input { accent-color: #4a9eff; }
   .fullbtn {
-    width: 100%; background: #1e1e26; color: #ccc; border: 1px solid #3a3a46;
+    width: 100%; background: #0c1526; color: #8ab8ff; border: 1px solid #1e3a5f;
     border-radius: 6px; padding: 10px; font-size: 12px; font-weight: 600;
     cursor: pointer; margin-top: 4px;
   }
-  .fullbtn:hover { background: #26262e; color: #fff; }
+  .fullbtn:hover { background: #12203a; color: #cfe1ff; }
 
   #status {
-    margin-top: 12px; font-size: 11px; color: #666;
+    margin-top: 12px; font-size: 11px; color: #3a5a8a;
     font-family: Consolas, monospace; min-height: 14px; word-break: break-all;
   }
-  #status.ok { color: #6fcf6f; }
-  #status.err { color: #ff6b6b; }
+  #status.ok { color: #4adeff; }
+  #status.err { color: #ff6b8a; }
 </style>
 </head>
 <body>
@@ -293,12 +295,11 @@
     </div>
     <input type="file" id="fileInput" accept=".html,.htm,text/html" multiple style="display:none">
 
-    <!-- ══ SAVE SYSTEM: export / import .launchpad ══ -->
     <div class="packrow">
       <button class="packbtn" onclick="exportPack()">💾 SAVE LIBRARY (.launchpad)</button>
       <button class="packbtn red" onclick="importPack()">📂 LOAD .launchpad</button>
     </div>
-    <input type="file" id="packInput" accept=".launchpad,.json" style="display:none">
+    <input type="file" id="packInput" accept=".launchpad" style="display:none">
 
     <div class="listhead">
       <span id="listCount">LIBRARY — 0 FILES</span>
@@ -368,7 +369,6 @@ function showScreen(id) {
   if (unlocked) secretDot.classList.add('on');
   if (mem !== 0) flagMem.style.display = '';
 
-  // ── TOKENIZER ──
   var FUNCS = ['asin','acos','atan','tenpow','sqrt','sin','cos','tan','log','exp','ln','ans','neg'];
   var POSTFIX = { '!': true, '%': true };
 
@@ -438,7 +438,6 @@ function showScreen(id) {
     return toks;
   }
 
-  // ── SHUNTING YARD → RPN ──
   var PREC = { '+': 2, '-': 2, '*': 3, '/': 3, '^': 4, neg: 4.5 };
   var POSTPREC = 5.5;
   var RIGHTASSOC = { '^': true, neg: true };
@@ -484,7 +483,6 @@ function showScreen(id) {
     return out;
   }
 
-  // ── RPN EVAL ──
   function fact(x) {
     if (x < 0 || x % 1 !== 0) return NaN;
     if (x > 170) return Infinity;
@@ -560,7 +558,6 @@ function showScreen(id) {
     return evalRPN(toRPN(toks));
   }
 
-  // ── FORMAT ──
   function fmt(x) {
     if (typeof x !== 'number' || isNaN(x)) return 'Error';
     if (!isFinite(x)) return x > 0 ? '∞' : '-∞';
@@ -570,7 +567,6 @@ function showScreen(id) {
     return String(parseFloat(x.toPrecision(12)));
   }
 
-  // ── DISPLAY ──
   function update() {
     dBig.classList.remove('err');
     if (mode === 'result') return;
@@ -583,7 +579,6 @@ function showScreen(id) {
     } else dSmall.textContent = '';
   }
 
-  // ── SECRET ──
   function unlock() {
     unlocked = true;
     try { sessionStorage.setItem('lx_unlocked', '1'); } catch (e) {}
@@ -595,7 +590,6 @@ function showScreen(id) {
     if (unlocked) showScreen('launcherScreen');
   });
 
-  // ── INPUT ──
   var MULTI = ['asin(','acos(','atan(','tenpow(','sqrt(','sin(','cos(','tan(','log(','exp(','ln(','ans','π'];
   function backspace() {
     mode = 'input';
@@ -647,7 +641,6 @@ function showScreen(id) {
     }
   }
 
-  // ── HISTORY ──
   var hist = [];
   try { hist = JSON.parse(localStorage.getItem('calc_hist') || '[]'); } catch (e) { hist = []; }
   var histPanel = document.getElementById('histPanel');
@@ -690,7 +683,6 @@ function showScreen(id) {
     histPanel.classList.toggle('open');
   });
 
-  // ── 2ND / DEG ──
   var k2nd = document.getElementById('k2nd');
   var FN2 = {
     sin: ['asin(', 'sin⁻¹'], cos: ['acos(', 'cos⁻¹'], tan: ['atan(', 'tan⁻¹'],
@@ -811,7 +803,10 @@ function showScreen(id) {
 })();
 
 // ═════════════════════════════════════════════════════════
-//  HTML LAUNCHER + SAVE SYSTEM
+//  HTML LAUNCHER + COMPRESSED .LAUNCHPAD SYSTEM
+//  Format: [magic "LPZ1"][4B orig size][gzip data]
+//  Fallback: [magic "LPL1"][4B orig size][LZ data]
+//  Legacy: [magic "LAUNCHPAD1"][plain JSON] (still loads)
 // ═════════════════════════════════════════════════════════
 (function() {
   var DB_NAME = 'html_launcher_db';
@@ -820,7 +815,9 @@ function showScreen(id) {
   var files = [];
   var launchMode = 'blank';
 
-  var PACK_MAGIC = 'LAUNCHPAD1';
+  var MAGIC_GZIP = 'LPZ1';
+  var MAGIC_LZ = 'LPL1';
+  var MAGIC_JSON = 'LAUNCHPAD1';
 
   function $(id) { return document.getElementById(id); }
   function esc(s) {
@@ -857,6 +854,131 @@ function showScreen(id) {
       tx.oncomplete = function() { resolve(req && req.result); };
       tx.onerror = function() { reject(tx.error); };
     });
+  }
+
+  // ── byte helpers ──
+  function textToBytes(str) {
+    var arr = new Uint8Array(str.length);
+    for (var i = 0; i < str.length; i++) arr[i] = str.charCodeAt(i) & 0xFF;
+    return arr;
+  }
+  function bytesToText(bytes) {
+    var str = '';
+    for (var i = 0; i < bytes.length; i++) str += String.fromCharCode(bytes[i]);
+    return str;
+  }
+  function concatBytes(a, b) {
+    var out = new Uint8Array(a.length + b.length);
+    out.set(a, 0);
+    out.set(b, a.length);
+    return out;
+  }
+  function u32ToBytes(n) {
+    return new Uint8Array([(n >>> 24) & 0xFF, (n >>> 16) & 0xFF, (n >>> 8) & 0xFF, n & 0xFF]);
+  }
+  function bytesToU32(b, o) {
+    return (b[o] << 24) | (b[o + 1] << 16) | (b[o + 2] << 8) | b[o + 3];
+  }
+
+  // ── GZIP via CompressionStream ──
+  function hasCompressionStream() {
+    return typeof CompressionStream !== 'undefined' &&
+           typeof DecompressionStream !== 'undefined';
+  }
+  function streamGzip(bytes, Compressor) {
+    return new Promise(function(resolve, reject) {
+      var cs = new Compressor('gzip');
+      var writer = cs.writable.getWriter();
+      writer.write(bytes).then(function() { return writer.close(); }).catch(function() {});
+      var chunks = [];
+      var reader = cs.readable.getReader();
+      function pump() {
+        reader.read().then(function(result) {
+          if (result.done) {
+            var total = 0;
+            chunks.forEach(function(c) { total += c.length; });
+            var out = new Uint8Array(total);
+            var off = 0;
+            chunks.forEach(function(c) { out.set(c, off); off += c.length; });
+            resolve(out);
+          } else {
+            chunks.push(result.value);
+            pump();
+          }
+        }).catch(reject);
+      }
+      pump();
+    });
+  }
+
+  // ── LZ fallback (window-based, hash-chain matched) ──
+  function lzCompress(bytes) {
+    var WINDOW = 4096, MAX_MATCH = 255, MIN_MATCH = 4;
+    var out = [];
+    var i = 0, n = bytes.length;
+    var hashTable = {};
+    var hashChain = new Array(n);
+
+    function hash(pos) {
+      return ((bytes[pos] << 16) | (bytes[pos + 1] << 8) | bytes[pos + 2]) % 65536;
+    }
+    for (var j = 0; j < n - 2; j++) {
+      var h = hash(j);
+      hashChain[j] = hashTable[h] || -1;
+      hashTable[h] = j;
+    }
+
+    while (i < n) {
+      var bestLen = 0, bestDist = 0;
+      if (i + MIN_MATCH <= n) {
+        var h2 = hash(i);
+        var candidate = hashTable[h2];
+        var tries = 0;
+        while (candidate !== -1 && candidate !== undefined && i - candidate <= WINDOW && tries < 32) {
+          if (candidate < i) {
+            var len = 0;
+            var maxLen = Math.min(MAX_MATCH, n - i);
+            while (len < maxLen && bytes[candidate + len] === bytes[i + len]) len++;
+            if (len > bestLen) {
+              bestLen = len; bestDist = i - candidate;
+              if (len >= MAX_MATCH) break;
+            }
+          }
+          candidate = hashChain[candidate];
+          tries++;
+        }
+      }
+      if (bestLen >= MIN_MATCH) {
+        out.push(0x00, (bestDist >> 8) & 0xFF, bestDist & 0xFF, bestLen);
+        i += bestLen;
+      } else {
+        out.push(0x01, bytes[i]);
+        i++;
+      }
+    }
+    return new Uint8Array(out);
+  }
+
+  function lzDecompress(bytes) {
+    var out = [];
+    var i = 0, n = bytes.length;
+    while (i < n) {
+      var marker = bytes[i];
+      if (marker === 0x00) {
+        if (i + 3 >= n) break;
+        var dist = (bytes[i + 1] << 8) | bytes[i + 2];
+        var len = bytes[i + 3];
+        var start = out.length - dist;
+        if (start < 0) throw 'Corrupt';
+        for (var j = 0; j < len; j++) out.push(out[start + j]);
+        i += 4;
+      } else if (marker === 0x01) {
+        if (i + 1 >= n) break;
+        out.push(bytes[i + 1]);
+        i += 2;
+      } else throw 'Corrupt';
+    }
+    return new Uint8Array(out);
   }
 
   // ── render ──
@@ -919,7 +1041,6 @@ function showScreen(id) {
     }
   }
 
-  // drag & drop
   var addbox = $('addbox');
   ['dragenter', 'dragover'].forEach(function(ev) {
     addbox.addEventListener(ev, function(e) {
@@ -955,16 +1076,14 @@ function showScreen(id) {
     });
   };
 
-  // ═══════════════════════════════════════════
-  //  SAVE SYSTEM — .launchpad export / import
-  // ═══════════════════════════════════════════
+  // ═══════════ COMPRESSED .LAUNCHPAD ═══════════
 
-  // EXPORT: bundle entire library -> single .launchpad file
+  // EXPORT — compress with gzip (or LZ), wrap with header
   window.exportPack = function() {
     if (!files.length) { status('library is empty — nothing to save', 'err'); return; }
 
     var pack = {
-      magic: PACK_MAGIC,
+      magic: MAGIC_JSON,
       exported: Date.now(),
       count: files.length,
       files: files.map(function(f) {
@@ -972,27 +1091,52 @@ function showScreen(id) {
       })
     };
 
-    var blob = new Blob([JSON.stringify(pack)], { type: 'application/octet-stream' });
-    var url = URL.createObjectURL(blob);
+    var jsonBytes = textToBytes(JSON.stringify(pack));
 
     var d = new Date();
     var stamp = d.getFullYear() + '-' +
       String(d.getMonth() + 1).padStart(2, '0') + '-' +
       String(d.getDate()).padStart(2, '0');
+    var fname = 'library-' + stamp + '-' + files.length + 'files.launchpad';
 
-    var a = document.createElement('a');
-    a.href = url;
-    a.download = 'library-' + stamp + '-' + files.length + 'files.launchpad';
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    setTimeout(function() { URL.revokeObjectURL(url); }, 5000);
+    function finish(fileBytes, method) {
+      var blob = new Blob([fileBytes], { type: 'application/octet-stream' });
+      var url = URL.createObjectURL(blob);
+      var a = document.createElement('a');
+      a.href = url;
+      a.download = fname;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      setTimeout(function() { URL.revokeObjectURL(url); }, 5000);
 
-    status('saved ' + files.length + ' file' + (files.length === 1 ? '' : 's') +
-      ' → ' + a.download + ' (' + fmtSize(blob.size) + ')', 'ok');
+      var ratio = ((1 - fileBytes.length / jsonBytes.length) * 100).toFixed(1);
+      status('saved ' + files.length + ' files → ' + fname +
+        ' | ' + fmtSize(jsonBytes.length) + ' → ' + fmtSize(fileBytes.length) +
+        ' (-' + ratio + '%, ' + method + ')', 'ok');
+    }
+
+    if (hasCompressionStream()) {
+      streamGzip(jsonBytes, CompressionStream).then(function(comp) {
+        var fileBytes = concatBytes(
+          concatBytes(textToBytes(MAGIC_GZIP), u32ToBytes(jsonBytes.length)), comp);
+        finish(fileBytes, 'gzip');
+      }).catch(function(e) {
+        // gzip failed? fall to LZ
+        var lz = lzCompress(jsonBytes);
+        var fileBytes = concatBytes(
+          concatBytes(textToBytes(MAGIC_LZ), u32ToBytes(jsonBytes.length)), lz);
+        finish(fileBytes, 'lz');
+      });
+    } else {
+      var lz = lzCompress(jsonBytes);
+      var fileBytes = concatBytes(
+        concatBytes(textToBytes(MAGIC_LZ), u32ToBytes(jsonBytes.length)), lz);
+      finish(fileBytes, 'lz');
+    }
   };
 
-  // IMPORT: load .launchpad file -> restore all files
+  // IMPORT — detect format, decompress, restore
   window.importPack = function() { $('packInput').click(); };
 
   $('packInput').addEventListener('change', function() {
@@ -1002,65 +1146,81 @@ function showScreen(id) {
 
     var reader = new FileReader();
     reader.onload = function() {
-      var pack;
-      try {
-        pack = JSON.parse(reader.result);
-      } catch (e) {
-        status('invalid .launchpad file (not readable)', 'err');
-        return;
-      }
+      var raw = new Uint8Array(reader.result);
 
-      // validate
-      if (!pack || pack.magic !== PACK_MAGIC) {
-        status('invalid .launchpad file (wrong format)', 'err');
-        return;
-      }
-      if (!pack.files || !pack.files.length) {
-        status('.launchpad file contains no files', 'err');
-        return;
-      }
+      // sniff magic
+      var magic = bytesToText(raw.slice(0, 10));
 
-      // dedupe: skip files that already exist (same name + same content)
-      var existing = {};
-      files.forEach(function(f) { existing[f.name + '|' + f.html.length] = true; });
+      function afterDecompress(jsonText) {
+        var pack;
+        try { pack = JSON.parse(jsonText); } catch (e) {
+          status('invalid .launchpad file (corrupt data)', 'err'); return;
+        }
+        if (!pack || pack.magic !== MAGIC_JSON || !pack.files || !pack.files.length) {
+          status('invalid .launchpad file (wrong format)', 'err'); return;
+        }
 
-      var added = 0, skipped = 0, pending = pack.files.length;
+        var existing = {};
+        files.forEach(function(f) { existing[f.name + '|' + f.html.length] = true; });
 
-      pack.files.forEach(function(pf) {
-        if (!pf.name || typeof pf.html !== 'string') { skipped++; pending--; checkImport(); return; }
-        var key = pf.name + '|' + pf.html.length;
-        if (existing[key]) { skipped++; pending--; checkImport(); return; }
+        var added = 0, skipped = 0, pending = pack.files.length;
 
-        var rec = {
-          id: Date.now() + Math.floor(Math.random() * 1000),
-          name: pf.name,
-          size: pf.html.length,
-          date: Date.now(),
-          html: pf.html
-        };
-        dbOp('readwrite', function(s) { return s.put(rec); }).then(function() {
-          files.push(rec);
-          added++;
-          pending--;
-          checkImport();
-        }).catch(function(e) {
-          skipped++;
-          pending--;
-          checkImport();
+        pack.files.forEach(function(pf) {
+          if (!pf.name || typeof pf.html !== 'string') { skipped++; pending--; checkImport(); return; }
+          if (existing[pf.name + '|' + pf.html.length]) { skipped++; pending--; checkImport(); return; }
+
+          var rec = {
+            id: Date.now() + Math.floor(Math.random() * 1000),
+            name: pf.name, size: pf.html.length, date: Date.now(), html: pf.html
+          };
+          dbOp('readwrite', function(s) { return s.put(rec); }).then(function() {
+            files.push(rec); added++; pending--; checkImport();
+          }).catch(function(e) { skipped++; pending--; checkImport(); });
         });
-      });
 
-      function checkImport() {
-        if (pending > 0) return;
-        render();
-        status('loaded ' + added + ' file' + (added === 1 ? '' : 's') +
-          (skipped ? ' | skipped ' + skipped + ' (already in library)' : ''), 'ok');
+        function checkImport() {
+          if (pending > 0) return;
+          render();
+          status('loaded ' + added + ' file' + (added === 1 ? '' : 's') +
+            (skipped ? ' | skipped ' + skipped + ' (already in library)' : ''), 'ok');
+        }
+      }
+
+      if (magic.indexOf(MAGIC_GZIP) === 0) {
+        // [LPZ1][4B size][gzip]
+        var body = raw.slice(8);
+        streamGzip(body, DecompressionStream).then(function(decomp) {
+          // verify size
+          var expected = bytesToU32(raw, 4);
+          if (decomp.length !== expected) {
+            status('corrupt file (size mismatch)', 'err'); return;
+          }
+          afterDecompress(bytesToText(decomp));
+        }).catch(function(e) {
+          status('decompression failed — corrupt file', 'err');
+        });
+      } else if (magic.indexOf(MAGIC_LZ) === 0) {
+        // [LPL1][4B size][lz]
+        try {
+          var body2 = raw.slice(8);
+          var decomp2 = lzDecompress(body2);
+          var expected2 = bytesToU32(raw, 4);
+          if (decomp2.length !== expected2) {
+            status('corrupt file (size mismatch)', 'err'); return;
+          }
+          afterDecompress(bytesToText(decomp2));
+        } catch (e) {
+          status('decompression failed — corrupt file', 'err');
+        }
+      } else if (magic.indexOf(MAGIC_JSON) === 0) {
+        // legacy plain JSON
+        afterDecompress(bytesToText(raw));
+      } else {
+        status('not a .launchpad file', 'err');
       }
     };
-    reader.onerror = function() {
-      status('failed to read file', 'err');
-    };
-    reader.readAsText(file);
+    reader.onerror = function() { status('failed to read file', 'err'); };
+    reader.readAsArrayBuffer(file);
   });
 
   // ── run ──
