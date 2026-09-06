@@ -8,90 +8,58 @@
 <style>
   * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
   html, body { height: 100%; }
-  body {
-    background: #06080d; color: #d8e4ff;
-    font-family: 'Segoe UI', Roboto, sans-serif;
-    overflow: hidden;
-  }
+  body { background: #06080d; color: #d8e4ff; font-family: 'Segoe UI', Roboto, sans-serif; overflow: hidden; }
   .screen {
     position: fixed; inset: 0; overflow-y: auto;
-    display: flex; align-items: center; justify-content: center;
-    padding: 12px;
+    display: flex; align-items: center; justify-content: center; padding: 12px;
     opacity: 0; pointer-events: none; transform: scale(.985);
     transition: opacity .25s ease, transform .25s ease;
   }
   .screen.active { opacity: 1; pointer-events: auto; transform: scale(1); }
 
-  /* ═══════════ CALCULATOR ═══════════ */
+  /* CALCULATOR */
   .calc {
     width: 100%; max-width: 296px; user-select: none;
-    background: #0a0e18;
-    border: 2px solid #1e3a5f;
-    border-radius: 16px;
+    background: #0a0e18; border: 2px solid #1e3a5f; border-radius: 16px;
     padding: 12px 10px 14px;
     box-shadow: 0 0 0 1px #0a1526, 0 14px 40px rgba(0,0,0,.6);
   }
-  .brandrow {
-    display: flex; justify-content: space-between; align-items: center;
-    margin-bottom: 8px; padding: 0 4px;
-  }
+  .brandrow { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; padding: 0 4px; }
   .brand { font-size: 11px; font-weight: 700; letter-spacing: 2px; color: #4a7ec2; text-transform: uppercase; }
   .histbtn { background: none; border: none; color: #34558a; font-size: 10px; font-weight: 700; letter-spacing: 1px; cursor: pointer; }
   .histbtn:hover { color: #6ea8ff; }
-
   .display {
-    position: relative;
-    background: #070b14; border: 1px solid #16305a; border-radius: 10px;
+    position: relative; background: #070b14; border: 1px solid #16305a; border-radius: 10px;
     padding: 12px 12px 10px; margin-bottom: 10px; text-align: right;
   }
-  .d-small {
-    min-height: 14px; font-size: 11px; color: #4a6a99;
-    font-family: Consolas, monospace; word-break: break-all;
-    overflow-x: auto; white-space: nowrap;
-  }
+  .d-small { min-height: 14px; font-size: 11px; color: #4a6a99; font-family: Consolas, monospace; word-break: break-all; overflow-x: auto; white-space: nowrap; }
   .d-big {
-    font-size: 26px; font-weight: 300; margin-top: 2px;
-    font-family: Consolas, monospace; word-break: break-all;
-    overflow-x: auto; white-space: nowrap; line-height: 1.15;
+    font-size: 26px; font-weight: 300; margin-top: 2px; font-family: Consolas, monospace;
+    word-break: break-all; overflow-x: auto; white-space: nowrap; line-height: 1.15;
     color: #e8f1ff; text-shadow: 0 0 12px rgba(74,158,255,.25);
   }
   .d-big.err { color: #ff6b8a; font-size: 16px; text-shadow: none; }
-  .d-flags {
-    position: absolute; top: 6px; left: 10px;
-    font-size: 9px; color: #34558a; font-weight: 700; letter-spacing: 1px;
-    display: flex; gap: 6px;
-  }
-  #secretDot {
-    position: absolute; top: 7px; right: 10px;
-    width: 6px; height: 6px; border-radius: 50%;
-    background: #1a2c4a; cursor: pointer; display: none;
-  }
+  .d-flags { position: absolute; top: 6px; left: 10px; font-size: 9px; color: #34558a; font-weight: 700; letter-spacing: 1px; display: flex; gap: 6px; }
+  #secretDot { position: absolute; top: 7px; right: 10px; width: 6px; height: 6px; border-radius: 50%; background: #1a2c4a; cursor: pointer; display: none; }
   #secretDot.on { display: block; }
   #secretDot:hover { background: #4a9eff; }
-
-  .histpanel {
-    display: none; background: #070b14; border: 1px solid #14264a;
-    border-radius: 8px; margin-bottom: 10px; padding: 4px;
-    max-height: 150px; overflow-y: auto;
-  }
+  .histpanel { display: none; background: #070b14; border: 1px solid #14264a; border-radius: 8px; margin-bottom: 10px; padding: 4px; max-height: 150px; overflow-y: auto; }
   .histpanel.open { display: block; }
   .hitem { padding: 6px 8px; border-radius: 5px; cursor: pointer; font-family: Consolas, monospace; font-size: 11px; }
   .hitem:hover { background: #0d1626; }
   .hitem .he { color: #3a5a8a; word-break: break-all; }
   .hitem .hr { color: #cfe1ff; font-size: 12px; }
   .hempty { color: #22344f; font-size: 10px; text-align: center; padding: 10px; }
-
   .keypad { display: grid; grid-template-columns: repeat(5, 1fr); gap: 6px; }
   .k {
     height: 44px; border: 1px solid #14264a; border-radius: 9px; cursor: pointer;
-    font-size: 15px; font-weight: 600; color: #d8e4ff;
-    background: #101a30; transition: background .1s, transform .05s;
-    font-family: inherit;
+    font-size: 15px; font-weight: 600; color: #d8e4ff; background: #101a30;
+    transition: background .1s, transform .05s; font-family: inherit;
   }
   .k:active { transform: scale(.92); }
-  .k.fn  { background: #0c1526; color: #5a86c2; font-size: 12px; border-color: #12223f; }
+  .k.fn { background: #0c1526; color: #5a86c2; font-size: 12px; border-color: #12223f; }
   .k.fn:hover { background: #12203a; color: #8ab8ff; }
-  .k.op  { background: #14264a; color: #6ea8ff; font-size: 17px; border-color: #1d3660; }
+  .k.op { background: #14264a; color: #6ea8ff; font-size: 17px; border-color: #1d3660; }
   .k.op:hover { background: #1a3055; }
   .k.num { background: #131f38; font-size: 17px; border-color: #1a2c4f; }
   .k.num:hover { background: #1a2a48; }
@@ -101,168 +69,118 @@
   .k.eq:hover { background: #2b6fe0; }
   .k.second-on { background: #1a3a6a !important; color: #6ea8ff !important; border-color: #2a4a80 !important; }
 
-  /* ═══════════ LAUNCHER ═══════════ */
+  /* LAUNCHER */
   .wrap { width: 100%; max-width: 560px; }
   header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; }
   h1 { font-size: 20px; letter-spacing: 1px; color: #e8f1ff; }
   h1 span { color: #4a9eff; }
-  .storebtn {
-    background: #0c1526; border: 1px solid #1e3a5f; color: #8ab8ff;
-    border-radius: 6px; padding: 8px 14px; font-size: 12px; font-weight: 600; cursor: pointer;
-  }
+  .storebtn { background: #0c1526; border: 1px solid #1e3a5f; color: #8ab8ff; border-radius: 6px; padding: 8px 14px; font-size: 12px; font-weight: 600; cursor: pointer; }
   .storebtn:hover { background: #12203a; color: #cfe1ff; }
   .lockbtn { background: none; border: none; color: #22344f; font-size: 20px; cursor: pointer; line-height: 1; padding: 0 10px 0 0; }
   .lockbtn:hover { color: #4a9eff; }
   .hgroup { display: flex; gap: 8px; }
-
   .addbox {
     background: #0a0e18; border: 2px dashed #1e3a5f; border-radius: 10px;
-    padding: 26px 16px; text-align: center; margin-bottom: 14px;
-    cursor: pointer; transition: border-color .15s;
+    padding: 26px 16px; text-align: center; margin-bottom: 14px; cursor: pointer; transition: border-color .15s;
   }
   .addbox:hover, .addbox.drag { border-color: #4a9eff; }
   .addbox .big { font-size: 26px; line-height: 1; margin-bottom: 8px; color: #4a9eff; }
   .addbox .t1 { font-size: 14px; font-weight: 600; color: #cfe1ff; }
   .addbox .t2 { font-size: 11px; color: #3a5a8a; margin-top: 4px; }
-
   .listhead { display: flex; justify-content: space-between; align-items: center; margin: 4px 0 8px; }
   .listhead span { font-size: 11px; color: #3a5a8a; letter-spacing: 1px; font-weight: 600; }
   .clearall { background: none; border: none; color: #ff6b8a; font-size: 11px; cursor: pointer; }
   .filecard {
     background: #0a0e18; border: 1px solid #16305a; border-radius: 8px;
-    padding: 12px 14px; margin-bottom: 8px;
-    display: flex; align-items: center; gap: 12px;
+    padding: 12px 14px; margin-bottom: 8px; display: flex; align-items: center; gap: 12px;
   }
-  .ficon {
-    width: 38px; height: 38px; flex-shrink: 0; border-radius: 8px;
-    background: #0c1526; display: flex; align-items: center; justify-content: center;
-    font-size: 16px; color: #4a9eff; font-weight: 700;
-  }
+  .ficon { width: 38px; height: 38px; flex-shrink: 0; border-radius: 8px; background: #0c1526; display: flex; align-items: center; justify-content: center; font-size: 16px; color: #4a9eff; font-weight: 700; }
   .fmeta { flex: 1; min-width: 0; }
   .fname { font-size: 13px; font-weight: 600; color: #e8f1ff; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
   .finfo { font-size: 10px; color: #3a5a8a; margin-top: 3px; font-family: Consolas, monospace; }
   .fbtns { display: flex; gap: 6px; flex-shrink: 0; }
-  .runbtn {
-    background: #1d5fd6; color: #fff; border: none; border-radius: 6px;
-    padding: 9px 18px; font-size: 12px; font-weight: 700; cursor: pointer;
-  }
+  .runbtn { background: #1d5fd6; color: #fff; border: none; border-radius: 6px; padding: 9px 18px; font-size: 12px; font-weight: 700; cursor: pointer; }
   .runbtn:hover { background: #2b6fe0; }
-  .rembtn {
-    background: #0c1526; color: #ff6b8a; border: 1px solid #3a2540;
-    border-radius: 6px; padding: 9px 12px; font-size: 12px; font-weight: 700; cursor: pointer;
-  }
+  .rembtn { background: #0c1526; color: #ff6b8a; border: 1px solid #3a2540; border-radius: 6px; padding: 9px 12px; font-size: 12px; font-weight: 700; cursor: pointer; }
   .rembtn:hover { background: #1a1520; }
   .empty { text-align: center; color: #22344f; font-size: 12px; padding: 30px 0; }
-
   .packrow { display: flex; gap: 8px; margin-bottom: 8px; }
-  .packbtn {
-    flex: 1; padding: 11px 8px; border-radius: 8px; font-size: 12px;
-    font-weight: 700; cursor: pointer; letter-spacing: .5px;
-    background: #0c1e30; color: #4adeff; border: 1px solid #16455a;
-  }
+  .packbtn { flex: 1; padding: 11px 8px; border-radius: 8px; font-size: 12px; font-weight: 700; cursor: pointer; letter-spacing: .5px; background: #0c1e30; color: #4adeff; border: 1px solid #16455a; }
   .packbtn:hover { background: #12283f; }
   .packbtn.red { background: #1a1526; color: #b08aff; border: 1px solid #34285a; }
   .packbtn.red:hover { background: #241c38; }
-
-  .settings {
-    background: #0a0e18; border: 1px solid #16305a; border-radius: 10px;
-    padding: 14px; margin-top: 14px; display: none;
-  }
+  .settings { background: #0a0e18; border: 1px solid #16305a; border-radius: 10px; padding: 14px; margin-top: 14px; display: none; }
   .settings.open { display: block; }
   .settings h2 { font-size: 11px; color: #4a6a99; letter-spacing: 1px; margin-bottom: 10px; }
   .setrow { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; gap: 8px; }
   .setrow label { font-size: 12px; color: #8ab8ff; }
   .setrow .hint { font-size: 10px; color: #34558a; display: block; margin-top: 2px; }
   .seg { display: flex; gap: 4px; flex-shrink: 0; }
-  .seg button {
-    background: #0c1526; border: 1px solid #16305a; color: #5a86c2;
-    border-radius: 4px; padding: 7px 12px; font-size: 11px; font-weight: 600; cursor: pointer;
-  }
+  .seg button { background: #0c1526; border: 1px solid #16305a; color: #5a86c2; border-radius: 4px; padding: 7px 12px; font-size: 11px; font-weight: 600; cursor: pointer; }
   .seg button.active { background: #14264a; color: #fff; border-color: #2a4a80; }
   .cloakrow { display: flex; gap: 6px; margin-bottom: 10px; }
-  .cloakrow input {
-    flex: 1; background: #070b14; border: 1px solid #16305a; color: #d8e4ff;
-    border-radius: 4px; padding: 9px; font-size: 12px; outline: none;
-  }
+  .cloakrow input { flex: 1; background: #070b14; border: 1px solid #16305a; color: #d8e4ff; border-radius: 4px; padding: 9px; font-size: 12px; outline: none; }
   .checkrow { display: flex; gap: 16px; font-size: 12px; color: #4a6a99; }
   .checkrow input { accent-color: #4a9eff; }
-  .fullbtn {
-    width: 100%; background: #0c1526; color: #8ab8ff; border: 1px solid #1e3a5f;
-    border-radius: 6px; padding: 10px; font-size: 12px; font-weight: 600;
-    cursor: pointer; margin-top: 4px;
-  }
+  .fullbtn { width: 100%; background: #0c1526; color: #8ab8ff; border: 1px solid #1e3a5f; border-radius: 6px; padding: 10px; font-size: 12px; font-weight: 600; cursor: pointer; margin-top: 4px; }
   .fullbtn:hover { background: #12203a; color: #cfe1ff; }
-
-  #status {
-    margin-top: 12px; font-size: 11px; color: #3a5a8a;
-    font-family: Consolas, monospace; min-height: 14px; word-break: break-all;
-  }
+  #status { margin-top: 12px; font-size: 11px; color: #3a5a8a; font-family: Consolas, monospace; min-height: 14px; word-break: break-all; }
   #status.ok { color: #4adeff; }
   #status.err { color: #ff6b8a; }
 </style>
 </head>
 <body>
 
-<!-- ═══════════ SCREEN 1: CALCULATOR ═══════════ -->
+<!-- SCREEN 1: CALCULATOR -->
 <div id="calcScreen" class="screen active">
   <div class="calc">
     <div class="brandrow">
       <div class="brand">Calculator</div>
       <button class="histbtn" id="histBtn">HISTORY</button>
     </div>
-
     <div class="histpanel" id="histPanel"></div>
-
     <div class="display">
       <div class="d-flags"><span id="flagDeg">DEG</span><span id="flagMem" style="display:none">M</span></div>
-      <div id="secretDot" title=""></div>
+      <div id="secretDot"></div>
       <div class="d-small" id="dSmall"></div>
       <div class="d-big" id="dBig">0</div>
     </div>
-
     <div class="keypad">
       <button class="k util" id="k2nd">2nd</button>
       <button class="k util" id="kDeg">DEG</button>
       <button class="k fn" data-fn="sin">sin</button>
       <button class="k fn" data-fn="cos">cos</button>
       <button class="k fn" data-fn="tan">tan</button>
-
       <button class="k fn" data-fn="ln">ln</button>
       <button class="k fn" data-fn="log">log</button>
       <button class="k fn" data-fn="sqrt">√</button>
       <button class="k fn" data-ins="^">xʸ</button>
       <button class="k fn" data-ins="!">n!</button>
-
       <button class="k fn" data-ins="π">π</button>
       <button class="k fn" data-ins="e">e</button>
       <button class="k fn" data-ins="(">(</button>
       <button class="k fn" data-ins=")">)</button>
       <button class="k fn" data-ins="%">%</button>
-
       <button class="k util" id="kC">C</button>
       <button class="k util" id="kBack">⌫</button>
       <button class="k op" data-ins="÷">÷</button>
       <button class="k op" data-ins="×">×</button>
       <button class="k util" data-ins="ans">ANS</button>
-
       <button class="k num" data-ins="7">7</button>
       <button class="k num" data-ins="8">8</button>
       <button class="k num" data-ins="9">9</button>
       <button class="k util" id="kMPlus">M+</button>
       <button class="k util" id="kMR">MR</button>
-
       <button class="k num" data-ins="4">4</button>
       <button class="k num" data-ins="5">5</button>
       <button class="k num" data-ins="6">6</button>
       <button class="k util" id="kMS">MS</button>
       <button class="k util" id="kMC">MC</button>
-
       <button class="k num" data-ins="1">1</button>
       <button class="k num" data-ins="2">2</button>
       <button class="k num" data-ins="3">3</button>
       <button class="k fn" data-ins="%">%</button>
       <button class="k util" id="kNeg">±</button>
-
       <button class="k num" data-ins="0">0</button>
       <button class="k num" data-ins=".">.</button>
       <button class="k op" data-ins="+">+</button>
@@ -271,37 +189,33 @@
   </div>
 </div>
 
-<!-- ═══════════ SCREEN 2: LAUNCHER (secret) ═══════════ -->
+<!-- SCREEN 2: LAUNCHER -->
 <div id="launcherScreen" class="screen">
   <div class="wrap">
     <header>
       <h1>HTML <span>LAUNCHER</span></h1>
       <div class="hgroup">
-        <button class="lockbtn" id="lockBtn" title="">•</button>
+        <button class="lockbtn" id="lockBtn">•</button>
         <button class="storebtn" onclick="toggleSettings()">CONFIG</button>
       </div>
     </header>
-
     <div class="addbox" id="addbox" onclick="pickFile()">
       <div class="big">+</div>
       <div class="t1">Add HTML files</div>
-      <div class="t2">tap to browse or drop files here — saved permanently on this device</div>
+      <div class="t2">tap to browse or drop files here — saved permanently</div>
     </div>
     <input type="file" id="fileInput" accept=".html,.htm,text/html" multiple style="display:none">
-
     <div class="packrow">
       <button class="packbtn" onclick="exportPack()">💾 SAVE LIBRARY (.launchpad)</button>
       <button class="packbtn red" onclick="importPack()">📂 LOAD .launchpad</button>
     </div>
     <input type="file" id="packInput" accept=".launchpad" style="display:none">
-
     <div class="listhead">
       <span id="listCount">LIBRARY — 0 FILES</span>
       <button class="clearall" onclick="clearAll()">REMOVE ALL</button>
     </div>
     <div id="fileList"></div>
     <div class="empty" id="emptyMsg">library is empty — add some .html files above</div>
-
     <div class="settings" id="settings">
       <h2>RUN CONFIG</h2>
       <div class="setrow">
@@ -324,13 +238,12 @@
       </div>
       <button class="fullbtn" onclick="selfCloak()">CLOAK THIS TAB</button>
     </div>
-
     <div id="status"></div>
   </div>
 </div>
 
 <script>
-// ═══════════════ SCREEN MANAGER ═══════════════
+// ═══════════ SCREEN MANAGER ═══════════
 function showScreen(id) {
   var screens = document.querySelectorAll('.screen');
   for (var i = 0; i < screens.length; i++) screens[i].classList.remove('active');
@@ -338,23 +251,11 @@ function showScreen(id) {
 }
 
 // ═════════════════════════════════════════════════════════
-//  CALCULATOR ENGINE — fixed
-//  THE BUG THAT WAS KILLED: ÷ and × are unicode chars (U+00F7,
-//  U+00D7) and the old operator check was '+-*/^'.indexOf(c)
-//  which never matched them -> every × ÷ expression threw
-//  Syntax. now they are first-class operators.
+//  CALCULATOR (fixed: ÷ × are first-class operators)
 // ═════════════════════════════════════════════════════════
 (function() {
   var SECRET = 3396981;
-
-  var expr = '';
-  var mode = 'input';
-  var lastResult = 0;
-  var ans = 0;
-  var mem = 0;
-  var deg = true;
-  var second = false;
-  var unlocked = false;
+  var expr = '', mode = 'input', lastResult = 0, ans = 0, mem = 0, deg = true, second = false, unlocked = false;
 
   var dSmall = document.getElementById('dSmall');
   var dBig = document.getElementById('dBig');
@@ -367,38 +268,29 @@ function showScreen(id) {
   if (unlocked) secretDot.classList.add('on');
   if (mem !== 0) flagMem.style.display = '';
 
-  // operator chars — ÷ and × INCLUDED this time
   var OPCHARS = '+-*/^÷×';
   var OPMAP = { '+': '+', '-': '-', '*': '*', '/': '/', '^': '^', '÷': '/', '×': '*' };
-
   var FUNCS = ['asin','acos','atan','tenpow','sqrt','sin','cos','tan','log','exp','ln','ans','neg'];
   var POSTFIX = { '!': true, '%': true };
 
-  // ── TOKENIZER ──
   function tokenize(src) {
     var toks = [];
     var i = 0, n = src.length;
-    var prevKind = null; // 'num'|'const'|'op'|'post'|'func'|'('|')'
-
+    var prevKind = null;
     function isDigit(c) { return c >= '0' && c <= '9'; }
     function isLetter(c) { return (c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z'); }
 
     while (i < n) {
       var c = src[i];
       if (c === ' ') { i++; continue; }
+      var kind = null, tok = null;
 
-      var kind = null;
-      var tok = null;
-
-      // number
       if (isDigit(c) || (c === '.' && isDigit(src.charAt(i + 1)))) {
         var j = i;
         while (j < n && (isDigit(src[j]) || src[j] === '.')) j++;
         tok = { t: 'num', v: parseFloat(src.slice(i, j)) };
-        kind = 'num';
-        i = j;
+        kind = 'num'; i = j;
       }
-      // letters: functions / constants
       else if (isLetter(c)) {
         var matched = null, mLen = 0;
         var rest = src.slice(i).toLowerCase();
@@ -413,16 +305,13 @@ function showScreen(id) {
         else { tok = { t: 'func', v: matched }; kind = 'func'; }
         i += mLen;
       }
-      // π constant
       else if (c === 'π') { tok = { t: 'num', v: Math.PI }; kind = 'const'; i++; }
-      // √ sqrt
       else if (c === '√') { tok = { t: 'func', v: 'sqrt' }; kind = 'func'; i++; }
-      // operators — ÷ × INCLUDED
       else if (OPCHARS.indexOf(c) >= 0) {
         if (c === '-' && (prevKind === null || prevKind === 'op' || prevKind === '(' || prevKind === 'post')) {
           tok = { t: 'op', v: 'neg', unary: true }; kind = 'op';
         } else if (c === '+' && (prevKind === null || prevKind === 'op' || prevKind === '(')) {
-          i++; continue; // unary plus: skip
+          i++; continue;
         } else {
           tok = { t: 'op', v: OPMAP[c] }; kind = 'op';
         }
@@ -433,12 +322,9 @@ function showScreen(id) {
       else if (POSTFIX[c]) { tok = { t: 'post', v: c }; kind = 'post'; i++; }
       else throw 'Syntax';
 
-      // implicit multiplication: 2π, 3(4+5), (2)(3), 5!
-      var curIsValStart = (kind === 'num' || kind === 'const' || kind === 'func' || kind === '(');
-      var prevIsValEnd = (prevKind === 'num' || prevKind === 'const' || prevKind === ')' || prevKind === 'post');
-      if (curIsValStart && prevIsValEnd) {
-        toks.push({ t: 'op', v: '*', implicit: true });
-      }
+      var curVal = (kind === 'num' || kind === 'const' || kind === 'func' || kind === '(');
+      var prevVal = (prevKind === 'num' || prevKind === 'const' || prevKind === ')' || prevKind === 'post');
+      if (curVal && prevVal) toks.push({ t: 'op', v: '*', implicit: true });
 
       toks.push(tok);
       prevKind = kind;
@@ -446,7 +332,6 @@ function showScreen(id) {
     return toks;
   }
 
-  // ── SHUNTING YARD → RPN ──
   var PREC = { '+': 2, '-': 2, '*': 3, '/': 3, '^': 4, neg: 4.5 };
   var POSTPREC = 5.5;
   var RIGHTASSOC = { '^': true, neg: true };
@@ -454,12 +339,9 @@ function showScreen(id) {
   function toRPN(toks) {
     var out = [], ops = [];
     function top() { return ops[ops.length - 1]; }
-
     for (var i = 0; i < toks.length; i++) {
       var tk = toks[i];
-      if (tk.t === 'num') { out.push(tk); continue; }
-      if (tk.t === 'func') { ops.push(tk); continue; }
-      if (tk.t === '(') { ops.push(tk); continue; }
+      if (tk.t === 'num' || tk.t === 'func' || tk.t === '(') { ops.push(tk); if (tk.t === 'num') { out.push(ops.pop()); } continue; }
       if (tk.t === ')') {
         while (ops.length && top().t !== '(') out.push(ops.pop());
         if (!ops.length) throw 'Syntax';
@@ -472,14 +354,13 @@ function showScreen(id) {
         ops.push(tk);
         continue;
       }
-      // operator
       var p = tk.unary ? PREC.neg : PREC[tk.v];
       while (ops.length) {
         var t1 = top();
         if (t1.t === 'op' || t1.t === 'post') {
           var p1 = (t1.t === 'post') ? POSTPREC : (t1.unary ? PREC.neg : PREC[t1.v]);
-          var rightAssoc = tk.unary ? true : !!RIGHTASSOC[tk.v];
-          if (p1 > p || (p1 === p && !rightAssoc)) { out.push(ops.pop()); continue; }
+          var ra = tk.unary ? true : !!RIGHTASSOC[tk.v];
+          if (p1 > p || (p1 === p && !ra)) { out.push(ops.pop()); continue; }
         }
         break;
       }
@@ -493,7 +374,6 @@ function showScreen(id) {
     return out;
   }
 
-  // ── EVAL ──
   function fact(x) {
     if (x < 0 || x % 1 !== 0) return NaN;
     if (x > 170) return Infinity;
@@ -505,18 +385,18 @@ function showScreen(id) {
   function applyFunc(name, x) {
     var d = Math.PI / 180;
     switch (name) {
-      case 'sin':   return Math.sin(deg ? x * d : x);
-      case 'cos':   return Math.cos(deg ? x * d : x);
-      case 'tan':   return Math.tan(deg ? x * d : x);
-      case 'asin':  var r = Math.asin(x); return deg ? r / d : r;
-      case 'acos':  var r2 = Math.acos(x); return deg ? r2 / d : r2;
-      case 'atan':  var r3 = Math.atan(x); return deg ? r3 / d : r3;
-      case 'sqrt':  return Math.sqrt(x);
-      case 'ln':    return Math.log(x);
-      case 'log':   return Math.log10(x);
-      case 'exp':   return Math.exp(x);
-      case 'tenpow':return Math.pow(10, x);
-      case 'neg':   return -x;
+      case 'sin': return Math.sin(deg ? x * d : x);
+      case 'cos': return Math.cos(deg ? x * d : x);
+      case 'tan': return Math.tan(deg ? x * d : x);
+      case 'asin': var r = Math.asin(x); return deg ? r / d : r;
+      case 'acos': var r2 = Math.acos(x); return deg ? r2 / d : r2;
+      case 'atan': var r3 = Math.atan(x); return deg ? r3 / d : r3;
+      case 'sqrt': return Math.sqrt(x);
+      case 'ln': return Math.log(x);
+      case 'log': return Math.log10(x);
+      case 'exp': return Math.exp(x);
+      case 'tenpow': return Math.pow(10, x);
+      case 'neg': return -x;
     }
     throw 'Syntax';
   }
@@ -578,20 +458,16 @@ function showScreen(id) {
     return String(parseFloat(x.toPrecision(12)));
   }
 
-  // ── DISPLAY ──
   function update() {
     dBig.classList.remove('err');
     if (mode === 'result') return;
     dBig.textContent = expr || '0';
     if (expr && /[\d.)π!%]$/.test(expr)) {
-      try {
-        var v = safeEval(expr);
-        dSmall.textContent = '= ' + fmt(v);
-      } catch (e) { dSmall.textContent = ''; }
+      try { dSmall.textContent = '= ' + fmt(safeEval(expr)); }
+      catch (e) { dSmall.textContent = ''; }
     } else dSmall.textContent = '';
   }
 
-  // ── SECRET ──
   function unlock() {
     unlocked = true;
     try { sessionStorage.setItem('lx_unlocked', '1'); } catch (e) {}
@@ -603,7 +479,6 @@ function showScreen(id) {
     if (unlocked) showScreen('launcherScreen');
   });
 
-  // ── INPUT ──
   var MULTI = ['asin(','acos(','atan(','tenpow(','sqrt(','sin(','cos(','tan(','log(','exp(','ln(','ans','π'];
   function backspace() {
     mode = 'input';
@@ -618,8 +493,7 @@ function showScreen(id) {
 
   var FUNCS_INSERT = ['sin(','cos(','tan(','asin(','acos(','atan(','log(','ln(','exp(','tenpow(','√('];
   function insert(val) {
-    var startsValue = /^[0-9.πe]/.test(val) || val === 'ans'
-      || FUNCS_INSERT.indexOf(val) >= 0;
+    var startsValue = /^[0-9.πe]/.test(val) || val === 'ans' || FUNCS_INSERT.indexOf(val) >= 0;
     if (mode === 'result') {
       if (/^[0-9.]$/.test(val) || (startsValue && !/^[\^!%+÷×\-]$/.test(val))) {
         expr = '';
@@ -641,8 +515,7 @@ function showScreen(id) {
         unlock();
         dSmall.textContent = expr + ' =';
         dBig.textContent = fmt(v);
-        mode = 'result';
-        lastResult = v; ans = v;
+        mode = 'result'; lastResult = v; ans = v;
         return;
       }
       pushHistory(expr, v);
@@ -654,12 +527,10 @@ function showScreen(id) {
       dSmall.textContent = expr;
       dBig.textContent = 'Syntax Error';
       dBig.classList.add('err');
-      mode = 'result';
-      lastResult = 0;
+      mode = 'result'; lastResult = 0;
     }
   }
 
-  // ── HISTORY ──
   var hist = [];
   try { hist = JSON.parse(localStorage.getItem('calc_hist') || '[]'); } catch (e) { hist = []; }
   var histPanel = document.getElementById('histPanel');
@@ -672,10 +543,7 @@ function showScreen(id) {
   }
 
   function renderHist() {
-    if (!hist.length) {
-      histPanel.innerHTML = '<div class="hempty">no calculations yet</div>';
-      return;
-    }
+    if (!hist.length) { histPanel.innerHTML = '<div class="hempty">no calculations yet</div>'; return; }
     var html = '';
     for (var i = 0; i < hist.length; i++) {
       html += '<div class="hitem" data-i="' + i + '"><div class="he">' +
@@ -688,19 +556,16 @@ function showScreen(id) {
       (function(item) {
         item.addEventListener('click', function() {
           expr = hist[parseInt(item.getAttribute('data-i'))].e;
-          mode = 'input';
-          update();
+          mode = 'input'; update();
         });
       })(items[j]);
     }
   }
   renderHist();
-
   document.getElementById('histBtn').addEventListener('click', function() {
     histPanel.classList.toggle('open');
   });
 
-  // ── 2ND / DEG ──
   var k2nd = document.getElementById('k2nd');
   var FN2 = {
     sin: ['asin(', 'sin⁻¹'], cos: ['acos(', 'cos⁻¹'], tan: ['atan(', 'tan⁻¹'],
@@ -736,7 +601,6 @@ function showScreen(id) {
         var ins;
         if (second && FN2[name]) {
           ins = FN2[name][0];
-          if (name === 'sqrt') ins = '^2';
           second = false;
           k2nd.classList.remove('second-on');
           var all = document.querySelectorAll('[data-fn]');
@@ -761,17 +625,12 @@ function showScreen(id) {
   }
 
   document.getElementById('kC').addEventListener('click', function() {
-    expr = ''; mode = 'input';
-    dSmall.textContent = '';
-    update();
+    expr = ''; mode = 'input'; dSmall.textContent = ''; update();
   });
   document.getElementById('kBack').addEventListener('click', backspace);
   document.getElementById('kEq').addEventListener('click', equals);
 
-  // ── MEMORY ──
-  function curVal() {
-    try { return safeEval(expr); } catch (e) { return lastResult; }
-  }
+  function curVal() { try { return safeEval(expr); } catch (e) { return lastResult; } }
   function saveMem() {
     try { localStorage.setItem('calc_mem', String(mem)); } catch (e) {}
     flagMem.style.display = mem !== 0 ? '' : 'none';
@@ -781,7 +640,6 @@ function showScreen(id) {
   document.getElementById('kMR').addEventListener('click', function() { insert(String(mem)); });
   document.getElementById('kMC').addEventListener('click', function() { mem = 0; saveMem(); });
 
-  // ── ± ──
   document.getElementById('kNeg').addEventListener('click', function() {
     if (mode === 'result') { expr = '(-' + fmt(lastResult) + ')'; mode = 'input'; update(); return; }
     var m = expr.match(/(\d*\.?\d+)$/);
@@ -793,13 +651,10 @@ function showScreen(id) {
       } else {
         expr = before + '(-' + m[1] + ')';
       }
-    } else {
-      expr += '(-';
-    }
+    } else { expr += '(-'; }
     update();
   });
 
-  // ── KEYBOARD ──
   document.addEventListener('keydown', function(e) {
     if (!document.getElementById('calcScreen').classList.contains('active')) return;
     if (e.target && /INPUT|TEXTAREA/.test(e.target.tagName)) return;
@@ -824,10 +679,10 @@ function showScreen(id) {
 })();
 
 // ═════════════════════════════════════════════════════════
-//  HTML LAUNCHER + .LAUNCHPAD v2 (binary + minify + gzip)
-//  Formats written:  LPZ2 (gzip) | LPL2 (LZ fallback)
-//  Formats read:     LPZ2, LPL2, LPZ1, LPL1, LAUNCHPAD1
-//  v2.1: TextEncoder/TextDecoder for UTF-8 correctness
+//  LAUNCHER + .LAUNCHPAD v3 COMPRESSION PIPELINE
+//  export: preprocess → binary TLV → deflate-raw (LPZ3)
+//          fallbacks: gzip (LPZ2) / LZ (LPL2)
+//  import: reads LPZ3, LPZ2, LPL2, LPZ1, LPL1, LAUNCHPAD1
 // ═════════════════════════════════════════════════════════
 (function() {
   var DB_NAME = 'html_launcher_db';
@@ -836,6 +691,7 @@ function showScreen(id) {
   var files = [];
   var launchMode = 'blank';
 
+  var MAGIC_RAW3 = 'LPZ3';
   var MAGIC_GZ2  = 'LPZ2';
   var MAGIC_LZ2  = 'LPL2';
   var MAGIC_GZ1  = 'LPZ1';
@@ -860,7 +716,6 @@ function showScreen(id) {
     return (d.getMonth() + 1) + '/' + d.getDate() + '/' + d.getFullYear();
   }
 
-  // ── IndexedDB ──
   function openDB() {
     return new Promise(function(resolve, reject) {
       var req = indexedDB.open(DB_NAME, 1);
@@ -869,20 +724,17 @@ function showScreen(id) {
       req.onerror = function() { reject(req.error); };
     });
   }
-  function dbOp(mode, fn) {
+  function dbOp(m, fn) {
     return new Promise(function(resolve, reject) {
-      var tx = db.transaction(STORE, mode);
-      var store = tx.objectStore(STORE);
-      var req = fn(store);
+      var tx = db.transaction(STORE, m);
+      var req = fn(tx.objectStore(STORE));
       tx.oncomplete = function() { resolve(req && req.result); };
       tx.onerror = function() { reject(tx.error); };
     });
   }
 
-  // ── byte helpers (UTF-8 safe) ──
   var TE = (typeof TextEncoder !== 'undefined') ? new TextEncoder() : null;
   var TD = (typeof TextDecoder !== 'undefined') ? new TextDecoder() : null;
-
   function textToBytes(str) {
     if (TE) return TE.encode(str);
     var arr = new Uint8Array(str.length);
@@ -897,8 +749,7 @@ function showScreen(id) {
   }
   function concatBytes(a, b) {
     var out = new Uint8Array(a.length + b.length);
-    out.set(a, 0);
-    out.set(b, a.length);
+    out.set(a, 0); out.set(b, a.length);
     return out;
   }
   function u32ToBytes(n) {
@@ -907,27 +758,79 @@ function showScreen(id) {
   function bytesToU32(b, o) {
     return ((b[o] << 24) | (b[o + 1] << 16) | (b[o + 2] << 8) | b[o + 3]) >>> 0;
   }
-  function u16ToBytes(n) {
-    return new Uint8Array([(n >> 8) & 0xFF, n & 0xFF]);
-  }
+  function u16ToBytes(n) { return new Uint8Array([(n >> 8) & 0xFF, n & 0xFF]); }
 
-  // ── minifier ──
-  function minifyHTML(src) {
-    if (typeof src !== 'string' || src.length < 64) return src;
-    var aggressive = !/<script/i.test(src) && !/<pre/i.test(src) && !/<textarea/i.test(src);
-    var lines = src.split('\n');
+  // ═══ REGION-AWARE PREPROCESSOR ═══
+  // script/pre/textarea regions untouched; style regions get
+  // CSS minify; normal regions lose comments + whitespace
+  function minifyNormal(text) {
+    text = text.replace(/<!--[\s\S]*?-->/g, '');
+    var lines = text.split('\n');
     var out = [];
     for (var i = 0; i < lines.length; i++) {
       var line = lines[i].replace(/\s+$/, '').replace(/^[ \t]+/, '');
       if (line === '') continue;
       out.push(line);
     }
-    var result = out.join('\n');
-    if (aggressive) result = result.replace(/[ \t]{2,}/g, ' ');
-    return result;
+    text = out.join('\n');
+    // collapse whitespace BETWEEN tags across newlines
+    // (inline text like >hello< never matches: no newline inside)
+    text = text.replace(/>\s*\n\s*</g, '><');
+    return text;
   }
 
-  // ── binary TLV container ──
+  function minifyCSSInner(css) {
+    css = css.replace(/\/\*[\s\S]*?\*\//g, '');
+    css = css.replace(/\s+/g, ' ');
+    css = css.replace(/\s*([{};:,>])\s*/g, '$1');
+    css = css.replace(/;}/g, '}');
+    return css.trim();
+  }
+
+  function preprocessHTML(src) {
+    if (typeof src !== 'string' || src.length < 64) return src;
+
+    var openTag = /<(script|pre|textarea|style)\b[^>]*>/gi;
+    var regions = [];
+    var last = 0, m;
+    while ((m = openTag.exec(src)) !== null) {
+      var tag = m[1].toLowerCase();
+      var after = m.index + m[0].length;
+      var closeRe = new RegExp('</' + tag + '\\s*>', 'i');
+      var rest = src.slice(after);
+      var cm = rest.search(closeRe);
+      var end;
+      if (cm === -1) end = src.length;
+      else end = after + cm + rest.slice(cm).match(closeRe)[0].length;
+
+      if (m.index > last) regions.push({ t: 'n', s: last, e: m.index });
+      regions.push({ t: tag, s: m.index, e: end });
+      last = end;
+      openTag.lastIndex = end;
+    }
+    regions.push({ t: 'n', s: last, e: src.length });
+
+    var outp = [];
+    for (var r = 0; r < regions.length; r++) {
+      var reg = regions[r];
+      var text = src.slice(reg.s, reg.e);
+      if (reg.t === 'n') {
+        outp.push(minifyNormal(text));
+      } else if (reg.t === 'style') {
+        var openM = text.match(/^<style\b[^>]*>/i);
+        var closeM = text.match(/<\/style\s*>/i);
+        var inner = text.slice(
+          openM ? openM[0].length : 0,
+          closeM ? text.length - closeM[0].length : text.length);
+        outp.push((openM ? openM[0] : '') + minifyCSSInner(inner) + (closeM ? closeM[0] : ''));
+      } else {
+        outp.push(text);
+      }
+    }
+    return outp.join('');
+  }
+
+  // ═══ BINARY TLV CONTAINER ═══
   function buildTLV(list) {
     var parts = [];
     for (var i = 0; i < list.length; i++) {
@@ -940,10 +843,10 @@ function showScreen(id) {
     }
     var total = 0;
     parts.forEach(function(p) { total += p.length; });
-    var outp = new Uint8Array(total);
+    var out = new Uint8Array(total);
     var off = 0;
-    parts.forEach(function(p) { outp.set(p, off); off += p.length; });
-    return outp;
+    parts.forEach(function(p) { out.set(p, off); off += p.length; });
+    return out;
   }
 
   function parseTLV(bytes) {
@@ -966,14 +869,10 @@ function showScreen(id) {
     return list;
   }
 
-  // ── gzip via CompressionStream ──
-  function hasCompressionStream() {
-    return typeof CompressionStream !== 'undefined' &&
-           typeof DecompressionStream !== 'undefined';
-  }
-  function streamGzip(bytes, Compressor) {
+  // ═══ STREAM COMPRESSION (any format) ═══
+  function compressStream(bytes, format) {
     return new Promise(function(resolve, reject) {
-      var cs = new Compressor('gzip');
+      var cs = new CompressionStream(format);
       var writer = cs.writable.getWriter();
       writer.write(bytes).then(function() { return writer.close(); }).catch(function() {});
       var chunks = [];
@@ -997,14 +896,43 @@ function showScreen(id) {
     });
   }
 
-  // ── LZ fallback ──
+  function decompressStream(bytes, format) {
+    return new Promise(function(resolve, reject) {
+      var ds = new DecompressionStream(format);
+      var writer = ds.writable.getWriter();
+      writer.write(bytes).then(function() { return writer.close(); }).catch(function() {});
+      var chunks = [];
+      var reader = ds.readable.getReader();
+      function pump() {
+        reader.read().then(function(result) {
+          if (result.done) {
+            var total = 0;
+            chunks.forEach(function(c) { total += c.length; });
+            var out = new Uint8Array(total);
+            var off = 0;
+            chunks.forEach(function(c) { out.set(c, off); off += c.length; });
+            resolve(out);
+          } else {
+            chunks.push(result.value);
+            pump();
+          }
+        }).catch(reject);
+      }
+      pump();
+    });
+  }
+
+  function supportsFormat(fmt) {
+    try { new CompressionStream(fmt); return true; } catch (e) { return false; }
+  }
+
+  // ═══ LZ FALLBACK ═══
   function lzCompress(bytes) {
     var WINDOW = 4096, MAX_MATCH = 255, MIN_MATCH = 4;
     var out = [];
     var i = 0, n = bytes.length;
     var hashTable = {};
     var hashChain = new Array(n);
-
     function hash(pos) {
       return ((bytes[pos] << 16) | (bytes[pos + 1] << 8) | bytes[pos + 2]) % 65536;
     }
@@ -1013,7 +941,6 @@ function showScreen(id) {
       hashChain[j] = hashTable[h] || -1;
       hashTable[h] = j;
     }
-
     while (i < n) {
       var bestLen = 0, bestDist = 0;
       if (i + MIN_MATCH <= n) {
@@ -1067,7 +994,7 @@ function showScreen(id) {
     return new Uint8Array(out);
   }
 
-  // ── render ──
+  // ═══ RENDER ═══
   function render() {
     var list = $('fileList');
     list.innerHTML = '';
@@ -1091,7 +1018,7 @@ function showScreen(id) {
     $('emptyMsg').style.display = files.length ? 'none' : '';
   }
 
-  // ── add ──
+  // ═══ ADD ═══
   window.pickFile = function() { $('fileInput').click(); };
 
   $('fileInput').addEventListener('change', function() {
@@ -1111,10 +1038,7 @@ function showScreen(id) {
           name: file.name, size: file.size, date: Date.now(), html: reader.result };
         dbOp('readwrite', function(s) { return s.put(rec); }).then(function() {
           files.push(rec); valid++; pending--; checkDone();
-        }).catch(function(e) {
-          pending--; checkDone();
-          status('storage failed: ' + (e && e.name || 'unknown'), 'err');
-        });
+        }).catch(function() { pending--; checkDone(); status('storage failed', 'err'); });
       };
       reader.onerror = function() { pending--; checkDone(); };
       reader.readAsText(file);
@@ -1130,21 +1054,19 @@ function showScreen(id) {
   var addbox = $('addbox');
   ['dragenter', 'dragover'].forEach(function(ev) {
     addbox.addEventListener(ev, function(e) {
-      e.preventDefault(); e.stopPropagation();
-      addbox.classList.add('drag');
+      e.preventDefault(); e.stopPropagation(); addbox.classList.add('drag');
     });
   });
   ['dragleave', 'drop'].forEach(function(ev) {
     addbox.addEventListener(ev, function(e) {
-      e.preventDefault(); e.stopPropagation();
-      addbox.classList.remove('drag');
+      e.preventDefault(); e.stopPropagation(); addbox.classList.remove('drag');
     });
   });
   addbox.addEventListener('drop', function(e) {
     if (e.dataTransfer && e.dataTransfer.files.length) addFiles(e.dataTransfer.files);
   });
 
-  // ── remove ──
+  // ═══ REMOVE ═══
   function removeFile(f) {
     dbOp('readwrite', function(s) { return s.delete(f.id); }).then(function() {
       files = files.filter(function(x) { return x.id !== f.id; });
@@ -1154,15 +1076,13 @@ function showScreen(id) {
   }
   window.clearAll = function() {
     if (!files.length) return;
-    if (!confirm('Remove ALL ' + files.length + ' files from the library?')) return;
+    if (!confirm('Remove ALL ' + files.length + ' files?')) return;
     dbOp('readwrite', function(s) { return s.clear(); }).then(function() {
-      files = [];
-      render();
-      status('library cleared', 'ok');
+      files = []; render(); status('library cleared', 'ok');
     });
   };
 
-  // ═══ EXPORT: minify → TLV → gzip → [LPZ2][4B size][data] ═══
+  // ═══ EXPORT: preprocess → TLV → deflate-raw ═══
   window.exportPack = function() {
     if (!files.length) { status('library is empty — nothing to save', 'err'); return; }
 
@@ -1171,7 +1091,7 @@ function showScreen(id) {
 
     var entries = [];
     files.forEach(function(f) {
-      entries.push({ name: f.name, html: minifyHTML(f.html) });
+      entries.push({ name: f.name, html: preprocessHTML(f.html) });
     });
 
     var tlv = buildTLV(entries);
@@ -1186,33 +1106,42 @@ function showScreen(id) {
       var blob = new Blob([fileBytes], { type: 'application/octet-stream' });
       var url = URL.createObjectURL(blob);
       var a = document.createElement('a');
-      a.href = url;
-      a.download = fname;
-      document.body.appendChild(a);
-      a.click();
+      a.href = url; a.download = fname;
+      document.body.appendChild(a); a.click();
       document.body.removeChild(a);
       setTimeout(function() { URL.revokeObjectURL(url); }, 5000);
-
       var ratio = ((1 - fileBytes.length / rawSize) * 100).toFixed(1);
       status('saved ' + files.length + ' files → ' + fname +
         ' | ' + fmtSize(rawSize) + ' → ' + fmtSize(fileBytes.length) +
-        ' (-' + ratio + '%, min+' + method + ')', 'ok');
+        ' (-' + ratio + '%, ' + method + ')', 'ok');
     }
 
-    if (hasCompressionStream()) {
-      streamGzip(tlv, CompressionStream).then(function(comp) {
-        finish(concatBytes(concatBytes(textToBytes(MAGIC_GZ2), u32ToBytes(tlv.length)), comp), 'gzip');
+    function wrap(magic, data) {
+      return concatBytes(concatBytes(textToBytes(magic), u32ToBytes(tlv.length)), data);
+    }
+
+    if (supportsFormat('deflate-raw')) {
+      compressStream(tlv, 'deflate-raw').then(function(comp) {
+        finish(wrap(MAGIC_RAW3, comp), 'min+deflate-raw');
       }).catch(function() {
-        var lz = lzCompress(tlv);
-        finish(concatBytes(concatBytes(textToBytes(MAGIC_LZ2), u32ToBytes(tlv.length)), lz), 'lz');
+        if (supportsFormat('gzip')) {
+          compressStream(tlv, 'gzip').then(function(c2) {
+            finish(wrap(MAGIC_GZ2, c2), 'min+gzip');
+          }).catch(function() { finish(wrap(MAGIC_LZ2, lzCompress(tlv)), 'min+lz'); });
+        } else {
+          finish(wrap(MAGIC_LZ2, lzCompress(tlv)), 'min+lz');
+        }
       });
+    } else if (supportsFormat('gzip')) {
+      compressStream(tlv, 'gzip').then(function(comp) {
+        finish(wrap(MAGIC_GZ2, comp), 'min+gzip');
+      }).catch(function() { finish(wrap(MAGIC_LZ2, lzCompress(tlv)), 'min+lz'); });
     } else {
-      var lz = lzCompress(tlv);
-      finish(concatBytes(concatBytes(textToBytes(MAGIC_LZ2), u32ToBytes(tlv.length)), lz), 'lz');
+      finish(wrap(MAGIC_LZ2, lzCompress(tlv)), 'min+lz');
     }
   };
 
-  // ═══ IMPORT: reads v2 + all legacy formats ═══
+  // ═══ IMPORT: reads every format ever written ═══
   window.importPack = function() { $('packInput').click(); };
 
   $('packInput').addEventListener('change', function() {
@@ -1227,16 +1156,12 @@ function showScreen(id) {
 
       function importList(list) {
         if (!list.length) { status('.launchpad contains no files', 'err'); return; }
-
         var existing = {};
         files.forEach(function(f) { existing[f.name + '|' + f.html.length] = true; });
-
         var added = 0, skipped = 0, pending = list.length;
-
         list.forEach(function(pf) {
           if (!pf.name || typeof pf.html !== 'string') { skipped++; pending--; check(); return; }
           if (existing[pf.name + '|' + pf.html.length]) { skipped++; pending--; check(); return; }
-
           var rec = {
             id: Date.now() + Math.floor(Math.random() * 1000),
             name: pf.name, size: pf.html.length, date: Date.now(), html: pf.html
@@ -1245,7 +1170,6 @@ function showScreen(id) {
             files.push(rec); added++; pending--; check();
           }).catch(function() { skipped++; pending--; check(); });
         });
-
         function check() {
           if (pending > 0) return;
           render();
@@ -1256,33 +1180,41 @@ function showScreen(id) {
 
       function importJSON(jsonText) {
         var pack;
-        try { pack = JSON.parse(jsonText); } catch (e) {
-          status('corrupt file (bad JSON)', 'err'); return; }
-        if (!pack || !pack.files || !pack.files.length) {
-          status('invalid .launchpad (wrong format)', 'err'); return; }
+        try { pack = JSON.parse(jsonText); } catch (e) { status('corrupt file (bad JSON)', 'err'); return; }
+        if (!pack || !pack.files || !pack.files.length) { status('invalid .launchpad', 'err'); return; }
         importList(pack.files);
       }
 
       function verifyThenImport(decomp, expected) {
-        if (decomp.length !== expected) {
-          status('corrupt file (size mismatch)', 'err'); return; }
+        if (decomp.length !== expected) { status('corrupt file (size mismatch)', 'err'); return; }
         try { importList(parseTLV(decomp)); }
         catch (e) { status('corrupt file (bad container)', 'err'); }
       }
 
-      if (magic.indexOf(MAGIC_GZ2) === 0) {
-        streamGzip(raw.subarray(8), DecompressionStream).then(function(dec) {
+      function tryDecompress(bytes, format, then) {
+        decompressStream(bytes, format).then(then).catch(function() {
+          status('decompression failed — corrupt file', 'err');
+        });
+      }
+
+      if (magic.indexOf(MAGIC_RAW3) === 0) {
+        tryDecompress(raw.subarray(8), 'deflate-raw', function(dec) {
           verifyThenImport(dec, bytesToU32(raw, 4));
-        }).catch(function() { status('decompression failed — corrupt file', 'err'); });
+        });
+      }
+      else if (magic.indexOf(MAGIC_GZ2) === 0) {
+        tryDecompress(raw.subarray(8), 'gzip', function(dec) {
+          verifyThenImport(dec, bytesToU32(raw, 4));
+        });
       }
       else if (magic.indexOf(MAGIC_LZ2) === 0) {
         try { verifyThenImport(lzDecompress(raw.subarray(8)), bytesToU32(raw, 4)); }
-        catch (e) { status('decompression failed — corrupt file', 'err'); }
+        catch (e) { status('corrupt file', 'err'); }
       }
       else if (magic.indexOf(MAGIC_GZ1) === 0) {
-        streamGzip(raw.subarray(8), DecompressionStream).then(function(dec) {
+        tryDecompress(raw.subarray(8), 'gzip', function(dec) {
           importJSON(bytesToText(dec));
-        }).catch(function() { status('decompression failed — corrupt file', 'err'); });
+        });
       }
       else if (magic.indexOf(MAGIC_LZ1) === 0) {
         try { importJSON(bytesToText(lzDecompress(raw.subarray(8)))); }
@@ -1299,7 +1231,7 @@ function showScreen(id) {
     reader.readAsArrayBuffer(file);
   });
 
-  // ── run ──
+  // ═══ RUN ═══
   function injectCloak(html) {
     var title = $('titleInput').value.trim();
     var icon = $('iconInput').value.trim();
@@ -1339,7 +1271,7 @@ function showScreen(id) {
     }
   }
 
-  // ── config ──
+  // ═══ CONFIG ═══
   window.toggleSettings = function() { $('settings').classList.toggle('open'); };
   window.setMode = function(m) {
     launchMode = m;
@@ -1357,14 +1289,14 @@ function showScreen(id) {
     showScreen('calcScreen');
   });
 
-  // ── init ──
+  // ═══ INIT ═══
   openDB().then(function(database) {
     db = database;
     return dbOp('readonly', function(s) { return s.getAll(); });
   }).then(function(recs) {
     files = recs || [];
     render();
-  }).catch(function(e) {
+  }).catch(function() {
     status('storage unavailable — session only', 'err');
   });
 
